@@ -12,7 +12,7 @@
 }
 
 #monCanva {
-     display: block;
+    display: block;
     position: fixed;
     top: 0;
     left: 0;
@@ -28,7 +28,7 @@ body {
 
 body {
     position: relative;
-    background: #000; 
+    background: #000;
 }
 
 body::before {
@@ -44,6 +44,7 @@ body::before {
     background-position: center;
     background-repeat: no-repeat;
 
-    filter: blur(2px) brightness(0.5); /* blur + assombrissement pour plus de visibilité */
+    filter: blur(2px) brightness(0.5);
+    /* blur + assombrissement pour plus de visibilité */
     z-index: -1;
 }

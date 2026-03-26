@@ -48,6 +48,44 @@ coeurPlein.src = "sprites/coeur_plein.png"; // Sprite coeurs restants
 var coeurVide = new Image();
 coeurVide.src = "sprites/coeur_vide.png"; // Sprite coeurs perdus
 
+// Sons du jeu pour chaques actions (volume pommes : 0 = muet, 1 = max — baisse si trop fort)
+var volumePommes = 0.25;
+var sonPomme = new Audio("sons/pomme.mp3");
+var sonDoree = new Audio("sons/pomme_doree.mp3");
+var sonPourrie = new Audio("sons/pomme_pourrie.mp3");
+sonPomme.volume = volumePommes;
+sonDoree.volume = volumePommes;
+sonPourrie.volume = volumePommes;
+var sonGameOver = new Audio("sons/game_over.mp3");
+var sonFin = new Audio("sons/fin.mp3");
+var sonViePerdue = new Audio("sons/vie.mp3");
+var sonUrgence = new Audio("sons/timer.mp3");
+
+// musique de fond
+var musique = new Audio("sons/musique.mp3");
+musique.loop = true;
+musique.volume = 0.3;
+
+// Fonction qui permet d'activer le son avec l'action d'un utilisateur (click, doigt sur l'écran)... à cause de la politique qui bloque
+var audioPret = false;
+function preparerAudio() {
+    if (audioPret) return;
+    audioPret = true;
+    sonPomme.volume = 0.1;
+    var p = sonPomme.play();
+    if (p !== undefined) {
+        p.then(function () {
+            sonPomme.pause();
+            sonPomme.currentTime = 0;
+            sonPomme.volume = volumePommes;
+        }).catch(function () {});
+    }
+    musique.play().catch(function () {});
+}
+document.addEventListener("click", preparerAudio, { passive: true });
+document.addEventListener("keydown", preparerAudio, { passive: true });
+document.addEventListener("touchstart", preparerAudio, { passive: true });
+
 // On mémorise l'état des touches gauche et droite dans des variables booléennes, ici
 // elle sont en false par défaut car au début elles ne sont pas enfoncées
 var droiteAppui = false;
@@ -77,6 +115,8 @@ function terminerJeu(message) {
     if (intervalId !== null) {
         clearInterval(intervalId);
     }
+
+    musique.pause();
 
     // Petite pause pour laisser le canvas afficher la dernière frame (coeurs/temps)
     setTimeout(function () {
@@ -199,11 +239,20 @@ function collisionPanier() {
             // SCORE selon type
             if (pommeSeule.type < 0.7) {
                 score += 1;
+                sonPomme.currentTime = 0;
+                sonPomme.play();
             } else if (pommeSeule.type < 0.8) {
                 score += 10;
+                sonDoree.currentTime = 0;
+                sonDoree.play().catch(function () {});
             } else {
                 vies--; // si pomme pourrie touchée -1 vie à chaque fois
                 score -= 5; // si pomme pourrie touchée -5 points à chaque fois
+
+                sonPourrie.currentTime = 0;
+                sonPourrie.play();
+
+                sonViePerdue.play();
 
                 if (vies <= 0) {
                     terminerJeu("JEU PERDU !");
@@ -246,12 +295,28 @@ function defVies() {
 
 function defTimer() {
     ctx.font = "32px 'Jersey 10'";
-    ctx.fillStyle = gold;
-    ctx.textAlign = "center"; // 👈 centré
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
 
-    ctx.fillText(formatTemps(tempsRestant), canvaJeu.width / 2, 20);
+    var x = canvaJeu.width / 2;
+    var y = 20;
+    var urgent = tempsRestant <= 10;
 
-    ctx.textAlign = "start"; // reset pour éviter bugs ailleurs
+    ctx.fillStyle = urgent ? "#e53935" : gold;
+
+    if (urgent) {
+        ctx.save();
+        ctx.translate(x, y);
+        var pulse = 1 + 0.1 * Math.sin(Date.now() / 350);
+        ctx.scale(pulse, pulse);
+        ctx.fillText(formatTemps(tempsRestant), 0, 0);
+        ctx.restore();
+    } else {
+        ctx.fillText(formatTemps(tempsRestant), x, y);
+    }
+
+    ctx.textAlign = "start";
+    ctx.textBaseline = "alphabetic";
 }
 
 function creerPomme() {
@@ -311,7 +376,7 @@ function dessiner() {
         ctx.textAlign = "center";
         ctx.font = "32px 'Jersey 10'";
         ctx.fillStyle = "white";
-        
+
         ctx.fillText(
             "Veuillez placer votre téléphone en mode portrait",
             canvaJeu.width / 2,

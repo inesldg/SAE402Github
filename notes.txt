@@ -7,11 +7,6 @@
 * Pigeon et cassos qui veulent voler --> système de micro
 
 * Sons:
-- pomme normale
-- pomme dorée
-- pomme pourrie
 - fin
 - game over
 - timer presque fini
-- vie perdue
-- musique de fond légère
