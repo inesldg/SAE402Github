@@ -1,0 +1,49 @@
+@import url('https://fonts.googleapis.com/css2?family=Jersey+10&family=Jersey+20&display=swap');
+
+:root {
+    /* Couleurs principales */
+    --gold-clair: #D6AB05;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+}
+
+#monCanva {
+     display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+}
+
+html,
+body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+body {
+    position: relative;
+    background: #000; 
+}
+
+body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+
+    background-image: url('../sprites/prairie.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+
+    filter: blur(2px) brightness(0.5); /* blur + assombrissement pour plus de visibilité */
+    z-index: -1;
+}

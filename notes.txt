@@ -1,0 +1,17 @@
+* Consignes au début + accepter son ?
+* Inclinaison tel
+* game over stylisé et pas en alerte
+
+* Au chargement : arbre, message qui dit de secouer, puis écran qui descends vers le bas et on récolte les pommes
+
+* Pigeon et cassos qui veulent voler --> système de micro
+
+* Sons:
+- pomme normale
+- pomme dorée
+- pomme pourrie
+- fin
+- game over
+- timer presque fini
+- vie perdue
+- musique de fond légère
