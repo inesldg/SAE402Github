@@ -13,21 +13,7 @@ function activerOrientationMobile() {
 }
 document.addEventListener("click", activerOrientationMobile, { once: true });
 document.addEventListener("touchstart", activerOrientationMobile, { once: true });
-
-// TOUCHES MOBILES
-document.addEventListener("touchstart", touchHandler, { passive: false }); // touchstart = doigt sur l'écran
-document.addEventListener("touchmove", touchHandler, { passive: false }); // touchmove = mouvement avec le doigt sur l'écran
-
-function touchHandler(e) {
-    if (e.touches) {
-
-        var touchX = e.touches[0].clientX - canvaJeu.offsetLeft;
-        panierX = touchX - panierW / 2;
-        panierX = Math.max(0, Math.min(panierX, canvaJeu.width - panierW));
-
-        e.preventDefault();
-    }
-}
+var appareilMobile = navigator.maxTouchPoints > 0;
 
 function handleOrientation(event) {
     // gamma = inclinaison gauche/droite du téléphone (portrait)
@@ -55,7 +41,13 @@ function orientationPaysage() {
 
 // Définit le format en tant que paysage et le stocke dans la variable modePaysage
 function verifierOrientation() {
+    var etaitPaysage = modePaysage;
     modePaysage = orientationPaysage();
+
+    // Sur téléphone, retour paysage -> portrait = nouvelle partie
+    if (appareilMobile && etaitPaysage && !modePaysage) {
+        document.location.reload();
+    }
 }
 
 // Appel dès le début pour que modePaysage ait la bonne valeur direct
