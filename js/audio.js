@@ -44,6 +44,13 @@ function preparerAudio() {
             // En cas d'échec, on laisse les prochains taps réessayer.
             sonPomme.volume = ancienVolume;
         });
+    } else {
+        // Certains navigateurs ne renvoient pas de Promise.
+        sonPomme.pause();
+        sonPomme.currentTime = 0;
+        sonPomme.volume = ancienVolume;
+        audioAction = true;
+        musique.play().catch(function () { });
     }
 }
 document.addEventListener("pointerdown", preparerAudio, { passive: true });
