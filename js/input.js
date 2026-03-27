@@ -4,6 +4,11 @@ window.addEventListener("deviceorientation", handleOrientation, true); // device
 
 // iPhone/iPad: demande l'autorisation gyroscope au 1er geste utilisateur
 function activerOrientationMobile() {
+    // Même geste utilisateur : on débloque aussi l'audio.
+    if (typeof preparerAudio === "function") {
+        preparerAudio();
+    }
+
     if (
         typeof DeviceOrientationEvent !== "undefined" &&
         typeof DeviceOrientationEvent.requestPermission === "function"
@@ -11,8 +16,9 @@ function activerOrientationMobile() {
         DeviceOrientationEvent.requestPermission().catch(function () {});
     }
 }
-document.addEventListener("click", activerOrientationMobile, { once: true });
+document.addEventListener("pointerdown", activerOrientationMobile, { once: true });
 document.addEventListener("touchstart", activerOrientationMobile, { once: true });
+document.addEventListener("click", activerOrientationMobile, { once: true });
 var appareilMobile = navigator.maxTouchPoints > 0;
 
 function handleOrientation(event) {

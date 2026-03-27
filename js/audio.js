@@ -4,6 +4,9 @@ var volumePommes = 0.05; // volume de son global de chacune des 3 pommes
 var sonPomme = new Audio("sons/pomme.mp3");
 var sonDoree = new Audio("sons/pomme_doree.mp3");
 var sonPourrie = new Audio("sons/pomme_pourrie.mp3");
+sonPomme.preload = "auto";
+sonDoree.preload = "auto";
+sonPourrie.preload = "auto";
 sonPomme.volume = volumePommes;
 sonDoree.volume = volumePommes;
 sonPourrie.volume = volumePommes;
@@ -12,8 +15,10 @@ sonPourrie.volume = volumePommes;
 //var sonFin = new Audio("sons/fin.mp3");
 
 var sonUrgence = new Audio("sons/timer.mp3"); // son pour le timer
+sonUrgence.preload = "auto";
 
 var musique = new Audio("sons/musique.mp3"); // musique de fond
+musique.preload = "auto";
 musique.volume = 1; // volume de la musique de fond
 
 // Fonction qui permet d'activer le son avec l'action d'un utilisateur (click, doigt sur l'écran)... 
@@ -44,5 +49,6 @@ function preparerAudio() {
 
     musique.play().catch(function () { });
 }
-document.addEventListener("click", preparerAudio, { passive: true });
-document.addEventListener("touchstart", preparerAudio, { passive: true });
+document.addEventListener("pointerdown", preparerAudio, { once: true });
+document.addEventListener("touchstart", preparerAudio, { once: true });
+document.addEventListener("click", preparerAudio, { once: true });
