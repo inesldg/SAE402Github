@@ -57,7 +57,7 @@ function collisionPanier() {
             if (pommeSeule.type < 0.7) {
                 score += 1;
                 sonPomme.currentTime = 0;
-                sonPomme.play();
+                sonPomme.play().catch(function () { });
             } else if (pommeSeule.type < 0.8) {
                 score += 10;
                 sonDoree.currentTime = 0;
@@ -67,7 +67,7 @@ function collisionPanier() {
                 score -= 5; // si pomme pourrie touchée -5 points à chaque fois
 
                 sonPourrie.currentTime = 0;
-                sonPourrie.play();
+                sonPourrie.play().catch(function () { });
 
                 if (vies <= 0) {
                     terminerJeu("JEU PERDU !");

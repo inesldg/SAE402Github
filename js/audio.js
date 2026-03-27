@@ -26,29 +26,26 @@ musique.volume = 1; // volume de la musique de fond
 var audioAction = false;
 function preparerAudio() {
     if (audioAction) return;
-    audioAction = true;
 
-    // Déverrouille tous les sons dès le 1er geste utilisateur (mobile).
-    function deverrouillerSon(son, volumeFinal) {
-        var ancienVolume = son.volume;
-        son.volume = 0;
-        var lecture = son.play();
-        if (lecture !== undefined) {
-            lecture.then(function () {
-                son.pause();
-                son.currentTime = 0;
-                son.volume = volumeFinal !== undefined ? volumeFinal : ancienVolume;
-            }).catch(function () { });
-        }
+    // Déverrouillage minimal mais robuste: 1 son test en muet.
+    var ancienVolume = sonPomme.volume;
+    sonPomme.volume = 0;
+
+    var tentative = sonPomme.play();
+    if (tentative !== undefined) {
+        tentative.then(function () {
+            sonPomme.pause();
+            sonPomme.currentTime = 0;
+            sonPomme.volume = ancienVolume;
+
+            audioAction = true; // activé seulement si succès réel
+            musique.play().catch(function () { });
+        }).catch(function () {
+            // En cas d'échec, on laisse les prochains taps réessayer.
+            sonPomme.volume = ancienVolume;
+        });
     }
-
-    deverrouillerSon(sonPomme, volumePommes);
-    deverrouillerSon(sonDoree, volumePommes);
-    deverrouillerSon(sonPourrie, volumePommes);
-    deverrouillerSon(sonUrgence);
-
-    musique.play().catch(function () { });
 }
-document.addEventListener("pointerdown", preparerAudio, { once: true });
-document.addEventListener("touchstart", preparerAudio, { once: true });
-document.addEventListener("click", preparerAudio, { once: true });
+document.addEventListener("pointerdown", preparerAudio, { passive: true });
+document.addEventListener("touchstart", preparerAudio, { passive: true });
+document.addEventListener("click", preparerAudio, { passive: true });
