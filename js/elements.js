@@ -30,6 +30,7 @@ var pommes = [];
 
 
 // SPRITES des élements //
+// J'utilise image (fonction prédéfinie en JavaScript) --> navigateur crée une <img> sans l'ajouter
 var spritePommeRouge = new Image();
 spritePommeRouge.src = "sprites/pommeRouge.png"; // Sprite pomme rouge
 
@@ -60,10 +61,10 @@ var scoreAffiche = 0; // score montré à l'écran mis à jour, qui devient scor
 var vies = 3;
 
 // On définit un timer
-var tempsRestant = 30;
-var gameOver = false;
-var intervalId = null;
-var finParTemps = false;
+var tempsRestant = 30; // 30sec par défaut
+var gameOver = false; // false = partie en cours
+var intervalId = null; // stocke l'identifiant du setInterval, sert à arrêter le timer proprement
+var finParTemps = false; // indique cause de la fin, ici fin car timer écoulé
 
 // Fonction qui permet d'afficher le score du joueur
-var hudY = 30; // hauteur commune du HUD (un peu sous le bord haut)
+var hudY = 30; // position verticale du texte en haut, 30 permets de descendre les éléments vers le bas
