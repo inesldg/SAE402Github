@@ -9,4 +9,5 @@
 * Sons:
 - fin
 - game over
-- timer presque fini
+
+* finir de clean les scripts
