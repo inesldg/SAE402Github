@@ -24,11 +24,12 @@ musique.volume = 1; // volume de la musique de fond
 // Fonction qui permet d'activer le son avec l'action d'un utilisateur (click, doigt sur l'écran)... 
 // à cause de la politique qui bloque automatiquement
 var audioAction = false;
+var audioActivationEnCours = false;
 function preparerAudio() {
-    if (audioAction) return;
+    if (audioAction || audioActivationEnCours) return;
+    audioActivationEnCours = true;
 
     // Déverrouillage minimal mais robuste: 1 son test en muet.
-    var ancienVolume = sonPomme.volume;
     sonPomme.volume = 0;
 
     var tentative = sonPomme.play();
@@ -36,20 +37,23 @@ function preparerAudio() {
         tentative.then(function () {
             sonPomme.pause();
             sonPomme.currentTime = 0;
-            sonPomme.volume = ancienVolume;
+            sonPomme.volume = volumePommes;
 
             audioAction = true; // activé seulement si succès réel
+            audioActivationEnCours = false;
             musique.play().catch(function () { });
         }).catch(function () {
             // En cas d'échec, on laisse les prochains taps réessayer.
-            sonPomme.volume = ancienVolume;
+            sonPomme.volume = volumePommes;
+            audioActivationEnCours = false;
         });
     } else {
         // Certains navigateurs ne renvoient pas de Promise.
         sonPomme.pause();
         sonPomme.currentTime = 0;
-        sonPomme.volume = ancienVolume;
+        sonPomme.volume = volumePommes;
         audioAction = true;
+        audioActivationEnCours = false;
         musique.play().catch(function () { });
     }
 }
