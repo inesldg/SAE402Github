@@ -33,8 +33,10 @@ function handleOrientation(event) {
     // gamma = inclinaison gauche/droite du téléphone (portrait)
     if (event.gamma === null || modePaysage) return;
 
-    var gamma = Math.max(-45, Math.min(45, event.gamma));
-    var ratio = (gamma + 45) / 90; // 0 -> gauche, 1 -> droite
+    // Plus la plage est petite, plus le panier réagit vite.
+    var plageInclinaison = 20; // essaie 15 si tu veux encore plus sensible
+    var gamma = Math.max(-plageInclinaison, Math.min(plageInclinaison, event.gamma));
+    var ratio = (gamma + plageInclinaison) / (plageInclinaison * 2); // 0 -> gauche, 1 -> droite
     panierX = ratio * (canvaJeu.width - panierW);
 }
 

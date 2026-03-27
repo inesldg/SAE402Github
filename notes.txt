@@ -11,3 +11,5 @@
 - game over
 
 * finir de clean les scripts
+
+* sur tel quand on passe en paysage et qu'on se remets ça recommence pas
