@@ -22,15 +22,26 @@ var audioAction = false;
 function preparerAudio() {
     if (audioAction) return;
     audioAction = true;
-    sonPomme.volume = 0.1;
-    var p = sonPomme.play();
-    if (p !== undefined) {
-        p.then(function () {
-            sonPomme.pause();
-            sonPomme.currentTime = 0;
-            sonPomme.volume = volumePommes;
-        }).catch(function () { });
+
+    // Déverrouille tous les sons dès le 1er geste utilisateur (mobile).
+    function deverrouillerSon(son, volumeFinal) {
+        var ancienVolume = son.volume;
+        son.volume = 0;
+        var lecture = son.play();
+        if (lecture !== undefined) {
+            lecture.then(function () {
+                son.pause();
+                son.currentTime = 0;
+                son.volume = volumeFinal !== undefined ? volumeFinal : ancienVolume;
+            }).catch(function () { });
+        }
     }
+
+    deverrouillerSon(sonPomme, volumePommes);
+    deverrouillerSon(sonDoree, volumePommes);
+    deverrouillerSon(sonPourrie, volumePommes);
+    deverrouillerSon(sonUrgence);
+
     musique.play().catch(function () { });
 }
 document.addEventListener("click", preparerAudio, { passive: true });
