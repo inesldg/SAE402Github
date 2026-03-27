@@ -5,9 +5,6 @@
 * Pigeon et cassos qui veulent voler --> système de micro
 
 * Sons:
-- fin
-- game over
+- fin sans perdre
 
 * finir de clean les scripts
-
-* décaler panier bords canva

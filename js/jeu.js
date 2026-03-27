@@ -54,6 +54,8 @@ intervalId = setInterval(function () {
 }, 1000);
 
 function collisionPanier() {
+    var margeCollisionX = 18; // élargit un peu la capture sur les côtés
+
     for (var i = 0; i < pommes.length; i++) {
         // Si le timer (ou la fin par vies) vient de déclencher,
         // on stoppe tout de suite pour ne plus modifier le score.
@@ -62,8 +64,8 @@ function collisionPanier() {
         var pommeSeule = pommes[i];
 
         if (
-            pommeSeule.x < panierX + panierW &&
-            pommeSeule.x + -5 > panierX && // distance à laquelle la pomme touche le panier sur les côtés (axe X)
+            pommeSeule.x < panierX + panierW + margeCollisionX &&
+            pommeSeule.x - 5 > panierX - margeCollisionX && // distance à laquelle la pomme touche le panier sur les côtés (axe X)
             pommeSeule.y < panierY + panierH &&
             pommeSeule.y + -20 > panierY // distance à laquelle la pomme touche le panier depuis le haut (axe Y)
         ) {
