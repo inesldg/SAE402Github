@@ -1,21 +1,48 @@
-var ecranFin = document.getElementById("ecranFin");
-var ecranFinTitre = document.getElementById("ecranFinTitre");
-var ecranFinScore = document.getElementById("ecranFinScore");
-var btnRejouer = document.getElementById("btnRejouer");
+var ecranGameOver = document.getElementById("ecranGameOver");
+var gameOverTitre = document.getElementById("gameOverTitre");
+var gameOverScore = document.getElementById("gameOverScore");
+var btnRejouerGameOver = document.getElementById("btnRejouerGameOver");
 
-if (btnRejouer) {
-    btnRejouer.addEventListener("click", function () {
+var ecranVictoire = document.getElementById("ecranVictoire");
+var victoireTitre = document.getElementById("victoireTitre");
+var victoireScore = document.getElementById("victoireScore");
+var btnRejouerVictoire = document.getElementById("btnRejouerVictoire");
+var btnContinuerHistoire = document.getElementById("btnContinuerHistoire");
+
+if (btnRejouerGameOver) {
+    btnRejouerGameOver.addEventListener("click", function () {
         document.location.reload();
     });
 }
 
-function afficherEcranFin(message) {
-    if (!ecranFin || !ecranFinTitre || !ecranFinScore) return;
-    ecranFinTitre.textContent = message;
-    ecranFinScore.textContent = "Score : " + scoreFinal;
+if (btnRejouerVictoire) {
+    btnRejouerVictoire.addEventListener("click", function () {
+        document.location.reload();
+    });
+}
+
+if (btnContinuerHistoire) {
+    btnContinuerHistoire.addEventListener("click", function () {
+        // Bouton temporaire: pas de redirection pour l'instant
+    });
+}
+
+function afficherGameOver(message) {
+    if (!ecranGameOver || !gameOverTitre || !gameOverScore) return;
+    gameOverTitre.textContent = message;
+    gameOverScore.textContent = "Score : " + scoreFinal;
     sonGameOverEcran.currentTime = 0;
     sonGameOverEcran.play().catch(function () { });
-    ecranFin.classList.remove("cache");
+    ecranGameOver.classList.remove("cache");
+}
+
+function afficherVictoire(message) {
+    if (!ecranVictoire || !victoireTitre || !victoireScore) return;
+    victoireTitre.textContent = message;
+    victoireScore.textContent = "Score : " + scoreFinal;
+    musiqueFinEcran.currentTime = 0;
+    musiqueFinEcran.play().catch(function () { });
+    ecranVictoire.classList.remove("cache");
 }
 
 // Termine le jeu une seule fois (évite les alert/reload en double)
@@ -29,11 +56,17 @@ function terminerJeu(message) {
     }
 
     musique.pause();
+    musiqueFinEcran.pause();
+    musiqueFinEcran.currentTime = 0;
     sonUrgence.pause();
     sonUrgence.currentTime = 0;
 
     var texte = message.replace("{score}", scoreFinal);
-    afficherEcranFin(texte);
+    if (finParTemps) {
+        afficherVictoire(texte);
+    } else {
+        afficherGameOver(texte);
+    }
 }
 
 // Permet d'ajouter un timer, et le jeu s'arrête à la fin du timer

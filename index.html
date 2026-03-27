@@ -11,12 +11,20 @@
 <body>
 
     <canvas id="monCanva"></canvas>
-    <div id="ecranFin" class="ecran-fin cache">
-        <div class="ecran-fin__contenu">
-            <h2 id="ecranFinTitre">Partie terminée</h2>
-            <p id="ecranFinScore">Score : 0</p>
-            <button id="btnRejouer" type="button">Rejouer</button>
+    <div id="ecranGameOver" class="ecran-fin ecran-fin--popup cache">
+        <h2 id="gameOverTitre">JEU PERDU !</h2>
+        <p id="gameOverScore">Score : 0</p>
+        <button id="btnRejouerGameOver" type="button">Rejouer</button>
+    </div>
+
+    <div id="ecranVictoire" class="ecran-fin cache">
+        <h2 id="victoireTitre">Partie terminée</h2>
+        <p id="victoireScore">Score : 0</p>
+        <div class="ecran-fin__actions">
+            <button id="btnRejouerVictoire" type="button">Rejouer</button>
+            <button id="btnContinuerHistoire" type="button">Continuer l'histoire</button>
         </div>
+        <img id="imagePanierFin" src="sprites/panier_fin.png" alt="Panier rempli de pommes">
     </div>
 
     <script src="js/elements.js"></script>

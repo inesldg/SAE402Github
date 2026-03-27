@@ -20,6 +20,9 @@ sonUrgence.preload = "auto";
 var sonGameOverEcran = new Audio("sons/game_over_ecran.mp3"); // son pour l'écran de game over
 sonGameOverEcran.preload = "auto";
 sonGameOverEcran.volume = 0.15;
+var musiqueFinEcran = new Audio("sons/fin_ecran.mp3"); // ajoute ton son de fin ici
+musiqueFinEcran.preload = "auto";
+musiqueFinEcran.volume = 0.35;
 
 var musique = new Audio("sons/musique.mp3"); // musique de fond
 musique.preload = "auto";
