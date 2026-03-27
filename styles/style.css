@@ -48,3 +48,50 @@ body::before {
     /* blur + assombrissement pour plus de visibilité */
     z-index: -1;
 }
+
+.ecran-fin {
+    position: fixed;
+    inset: 0;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.7);
+}
+
+.cache {
+    display: none;
+}
+
+.ecran-fin__contenu {
+    min-width: 260px;
+    padding: 24px;
+    border-radius: 12px;
+    text-align: center;
+    background: rgba(20, 20, 20, 0.95);
+    color: #fff;
+    font-family: "Jersey 10", sans-serif;
+}
+
+#ecranFinTitre {
+    margin-bottom: 10px;
+    font-size: 2rem;
+    letter-spacing: 2px;
+}
+
+#ecranFinScore {
+    margin-bottom: 16px;
+    font-size: 1.6rem;
+    color: var(--gold);
+}
+
+#btnRejouer {
+    padding: 10px 18px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: "Jersey 10", sans-serif;
+    font-size: 1.2rem;
+    background: var(--gold);
+    color: #1b1b1b;
+}

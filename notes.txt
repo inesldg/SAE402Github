@@ -9,3 +9,5 @@
 - game over
 
 * finir de clean les scripts
+
+* décaler panier bords canva

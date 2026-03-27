@@ -42,7 +42,7 @@ function defTimer() {
 
     var x = canvaJeu.width / 2;
     var y = hudY;
-    var urgent = tempsRestant <= 10 && tempsRestant > 0;
+    var urgent = !gameOver && tempsRestant <= 10 && tempsRestant > 0;
 
     ctx.fillStyle = urgent ? "#e53935" : gold;
 

@@ -1,3 +1,23 @@
+var ecranFin = document.getElementById("ecranFin");
+var ecranFinTitre = document.getElementById("ecranFinTitre");
+var ecranFinScore = document.getElementById("ecranFinScore");
+var btnRejouer = document.getElementById("btnRejouer");
+
+if (btnRejouer) {
+    btnRejouer.addEventListener("click", function () {
+        document.location.reload();
+    });
+}
+
+function afficherEcranFin(message) {
+    if (!ecranFin || !ecranFinTitre || !ecranFinScore) return;
+    ecranFinTitre.textContent = message;
+    ecranFinScore.textContent = "Score : " + scoreFinal;
+    sonGameOverEcran.currentTime = 0;
+    sonGameOverEcran.play().catch(function () { });
+    ecranFin.classList.remove("cache");
+}
+
 // Termine le jeu une seule fois (évite les alert/reload en double)
 function terminerJeu(message) {
     if (gameOver) return; // garde-fou anti-doubles déclenchements
@@ -12,14 +32,8 @@ function terminerJeu(message) {
     sonUrgence.pause();
     sonUrgence.currentTime = 0;
 
-    // Petite pause pour laisser le canvas afficher la dernière frame (coeurs/temps)
-    setTimeout(function () {
-        // Pour la fin "Bravo", on injecte le score final capturé
-        var texte = message;
-        texte = texte.replace("{score}", scoreFinal);
-        alert(texte);
-        document.location.reload();
-    }, 50);
+    var texte = message.replace("{score}", scoreFinal);
+    afficherEcranFin(texte);
 }
 
 // Permet d'ajouter un timer, et le jeu s'arrête à la fin du timer
