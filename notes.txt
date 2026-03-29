@@ -1,10 +1,6 @@
-* Consignes au début + accepter son ?
-* game over stylisé et pas en alerte
+* Consignes au début
 * Au chargement : arbre, message qui dit de secouer, puis écran qui descends vers le bas et on récolte les pommes
 
 * Pigeon et cassos qui veulent voler --> système de micro
-
-* Sons:
-- fin sans perdre
 
 * finir de clean les scripts

@@ -11,27 +11,32 @@
 <body>
 
     <canvas id="monCanva"></canvas>
+
+    <!-- Écran qui s'affiche en cas de fin par manque de vies-->
     <div id="ecranGameOver" class="ecran-fin ecran-fin--popup cache">
         <h2 id="gameOverTitre">JEU PERDU !</h2>
         <p id="gameOverScore">Score : 0</p>
         <button id="btnRejouerGameOver" type="button">Rejouer</button>
     </div>
 
+    <!-- Écran qui s'affiche en cas de victoire (temps écoulé)-->
     <div id="ecranVictoire" class="ecran-fin cache">
-        <h2 id="victoireTitre">Partie terminée</h2>
-        <p id="victoireScore">Score : 0</p>
-        <div class="ecran-fin__actions">
-            <button id="btnRejouerVictoire" type="button">Rejouer</button>
-            <button id="btnContinuerHistoire" type="button">Continuer l'histoire</button>
+        <div class="ecran-victoire__contenu">
+            <h2 id="victoireTitre">Partie terminée</h2>
+            <p id="victoireScore">Score : 0</p>
+            <div class="ecran-fin__actions">
+                <button id="btnRejouerVictoire" type="button">Rejouer</button>
+                <button id="btnContinuerHistoire" type="button">Continuer l'histoire</button>
+            </div>
+            <img id="imagePanierFin" src="sprites/panier_fin.png" alt="Panier rempli de pommes">
         </div>
-        <img id="imagePanierFin" src="sprites/panier_fin.png" alt="Panier rempli de pommes">
     </div>
 
-    <script src="js/elements.js"></script>
-    <script src="js/audio.js"></script>
-    <script src="js/input.js"></script>
-    <script src="js/UI.js"></script>
-    <script src="js/jeu.js"></script>
+    <script src="js/elements.js"></script> <!-- sprites, score, vies, timer...-->
+    <script src="js/audio.js"></script> <!-- audio du jeu et activation pour la norme...-->
+    <script src="js/input.js"></script> <!-- contrôles du jeu (gyroscope tel + souris ordi) et orientation du tel -->
+    <script src="js/UI.js"></script> <!-- affichage du score, timer et vies -->
+    <script src="js/jeu.js"></script> <!-- script principal du jeu (collisions, dessin des éléments, boutons...) -->
 </body>
 
 </html>

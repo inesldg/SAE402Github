@@ -1,34 +1,44 @@
-document.addEventListener("mousemove", mouseMoveHandler, false); // mousemove = mouvement de la souris
+document.addEventListener("mousemove", mouseMoveHandler, false); // Contrôle souris
 
-window.addEventListener("deviceorientation", handleOrientation, true); // deviceorientation = mouvement du téléphone
+window.addEventListener("deviceorientation", handleOrientation, true); // Contrôle gyroscope (mouvement du téléphone)
 
-// iPhone/iPad: demande l'autorisation gyroscope au 1er geste utilisateur
+// Comme sur IOS le device orientation est désactivé par défaut on l'active par un clic et au passage on active aussi l'audio par un clic si pas déjà fait
 function activerOrientationMobile() {
-    // Même geste utilisateur : on débloque aussi l'audio.
     if (typeof preparerAudio === "function") {
         preparerAudio();
     }
 
+    // Uniquement sur les navigateurs qui exposent requestPermission (IOS etc), on ignore les erreurs avec catch pour ne pas casser le script
     if (
         typeof DeviceOrientationEvent !== "undefined" &&
         typeof DeviceOrientationEvent.requestPermission === "function"
     ) {
-        DeviceOrientationEvent.requestPermission().catch(function () {});
+        DeviceOrientationEvent.requestPermission().catch(function () { });
     }
 }
+
+//  Trois types d'événements possibles pour couvrir souris, doigt et stylet
+// { once: true } = la fonction ne s'exécute qu'une fois au total
 document.addEventListener("pointerdown", activerOrientationMobile, { once: true });
 document.addEventListener("touchstart", activerOrientationMobile, { once: true });
 document.addEventListener("click", activerOrientationMobile, { once: true });
+
+// Détection simple "appareil tactile" : utilisé ailleurs (reset orientation)
 var appareilMobile = navigator.maxTouchPoints > 0;
 
 function handleOrientation(event) {
-    // gamma = inclinaison gauche/droite du téléphone (portrait)
+    // Si pas de données capteur, ou mode paysage : on ne déplace pas le panier (le jeu affiche un message paysage)
     if (event.gamma === null || modePaysage) return;
 
-    // Plus la plage est petite, plus le panier réagit vite.
-    var plageInclinaison = 20; // essaie 15 si tu veux encore plus sensible
+    // 20° pour la sensibilité, permet d'éviter de trop pencher le téléphone car c'est chiant
+    var plageInclinaison = 20; 
     var gamma = Math.max(-plageInclinaison, Math.min(plageInclinaison, event.gamma));
-    var ratio = (gamma + plageInclinaison) / (plageInclinaison * 2); // 0 -> gauche, 1 -> droite
+
+    // On ramène gamma entre -plage et +plage vers un ratio entre 0 (gauche) et 1 (droite)
+    // Exemple plage 20 : gamma = -20 → ratio 0 ; gamma = 0 → ratio 0.5 ; gamma = +20 → ratio 1
+    var ratio = (gamma + plageInclinaison) / (plageInclinaison * 2);
+
+    // panierX est le coin haut-gauche du sprite : le panier peut aller de 0 à (largeur canvas - largeur panier)
     panierX = ratio * (canvaJeu.width - panierW);
 }
 

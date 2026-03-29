@@ -68,11 +68,47 @@ body::before {
     gap: 10px;
 }
 
+/* Fin par timer : fond prairie net (comme le jeu, sans blur) + bloc centré au milieu */
 #ecranVictoire {
-    text-align: center;
+    justify-content: center;
+    align-items: center;
+    /* Marge haute suffisante (safe area iPhone) : évite que le titre soit coupé — pas de translateY sur le texte */
+    padding: max(28px, env(safe-area-inset-top, 0px) + 20px) 20px 24px;
+    box-sizing: border-box;
+    overflow: visible;
+    /* Remplace entièrement le fond sombre de .ecran-fin — prairie nette, pas de blur */
+    background: linear-gradient(rgba(0, 0, 0, 0.18), rgba(0, 0, 0, 0.22)),
+        url("../sprites/prairie.png") center center / cover no-repeat;
+}
+
+.ecran-victoire__contenu {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     justify-content: center;
     gap: 16px;
-    padding: 24px;
+    text-align: center;
+    max-width: min(420px, 92vw);
+}
+
+/* Titre + score : pas de translateY (sinon coupure avec overflow du viewport) */
+#ecranVictoire #victoireTitre {
+    margin-bottom: 6px;
+    line-height: 1.15;
+}
+
+#ecranVictoire #victoireScore {
+    margin-top: 0;
+    margin-bottom: 6px;
+}
+
+/* Boutons empilés : Rejouer au-dessus, Continuer l'histoire en dessous */
+#ecranVictoire .ecran-fin__actions {
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: stretch;
+    width: min(280px, 88vw);
+    gap: 10px;
 }
 
 .cache {
@@ -88,11 +124,17 @@ body::before {
     text-align: center;
 }
 
-#gameOverScore,
-#victoireScore {
+#gameOverScore {
     font-family: "Jersey 10", sans-serif;
     font-size: 2rem;
     color: var(--gold);
+    text-align: center;
+}
+
+#victoireScore {
+    font-family: "Jersey 10", sans-serif;
+    font-size: 2rem;
+    color: #fff;
     text-align: center;
 }
 

@@ -87,7 +87,7 @@ intervalId = setInterval(function () {
 }, 1000);
 
 function collisionPanier() {
-    var margeCollisionX = 18; // élargit un peu la capture sur les côtés
+    var margeCollisionX = 8;
 
     for (var i = 0; i < pommes.length; i++) {
         // Si le timer (ou la fin par vies) vient de déclencher,
@@ -119,7 +119,7 @@ function collisionPanier() {
                 sonPourrie.play().catch(function () { });
 
                 if (vies <= 0) {
-                    terminerJeu("JEU PERDU !");
+                    terminerJeu("PARTIE PERDUE :(");
                 }
             }
 
@@ -233,7 +233,7 @@ function dessiner() {
 
     // Fin par temps déclenchée ici pour figer un score cohérent avec la frame affichée
     if (finParTemps) {
-        terminerJeu("C'est fini, Bravo ! Score : {score}");
+        terminerJeu("PARTIE TERMINÉE ! BIEN JOUÉ :)");
         return;
     }
 

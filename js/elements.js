@@ -20,8 +20,8 @@ var rootStyles = getComputedStyle(document.documentElement);
 var gold = rootStyles.getPropertyValue("--gold");
 
 // Variables qui définissent notre petit panier !
-var panierW = 120; // largeur
-var panierH = 110; // hauteur
+var panierW = 90; // largeur
+var panierH = 80; // hauteur
 var panierX = (canvaJeu.width - panierW) / 2; // position axe X
 var panierY = canvaJeu.height - panierH - 20; // position axe Y
 

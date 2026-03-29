@@ -10,15 +10,18 @@ function formatTemps(secondes) {
     return minutes + ":" + sec;
 }
 
+// Affiche le score en haut à gauche avec une jolie police que j'ai choisi et une couleur importée en variables :)
 function defScore() {
     ctx.font = "32px 'Jersey 10'";
     ctx.fillStyle = gold;
     ctx.textBaseline = "middle";
     scoreAffiche = gameOver ? scoreFinal : score;
-    ctx.fillText("Score: " + scoreAffiche, 8, hudY);
+    ctx.fillText("Score : " + scoreAffiche, 8, hudY);
     ctx.textBaseline = "alphabetic";
 }
 
+// Affiche les coeurs de vie, pleins ou vides selon le nombres de vies restants 
+// (si le joueur perds une vie alors de gauche à droite on affiche les coeurs vide)
 function defVies() {
     var taille = 30; // taille des coeurs
     var espacement = 10;
@@ -35,6 +38,7 @@ function defVies() {
     }
 }
 
+// Affiche le timer au milieu avec le même style que le score :) 
 function defTimer() {
     ctx.font = "32px 'Jersey 10'";
     ctx.textAlign = "center";
@@ -42,17 +46,17 @@ function defTimer() {
 
     var x = canvaJeu.width / 2;
     var y = hudY;
-    var urgent = !gameOver && tempsRestant <= 10 && tempsRestant > 0;
+    var urgent = !gameOver && tempsRestant <= 10 && tempsRestant > 0; // urgent se déclenche quand il reste moins de 10s
 
-    ctx.fillStyle = urgent ? "#e53935" : gold;
+    ctx.fillStyle = urgent ? "#e53935" : gold; // le texte devient rouge quand il ne reste que 10s
 
     if (urgent) {
         if (sonUrgence.paused) {
-            sonUrgence.play().catch(function () {});
+            sonUrgence.play().catch(function () { }); // quand il reste 10s --> son de timer
         }
         ctx.save();
         ctx.translate(x, y);
-        var pulse = 1 + 0.1 * Math.sin(Date.now() / 350);
+        var pulse = 1 + 0.1 * Math.sin(Date.now() / 350); // animation de pulsion pour le texte quand il reste 10s
         ctx.scale(pulse, pulse);
         ctx.fillText(formatTemps(tempsRestant), 0, 0);
         ctx.restore();
