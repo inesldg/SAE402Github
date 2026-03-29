@@ -1,4 +1,7 @@
-document.addEventListener("mousemove", mouseMoveHandler, false); // Contrôle souris
+// Souris uniquement sur PC pour éviter des comportements parasites sur tel comme un deuxième opanier quand on clique etc
+if (!(navigator.maxTouchPoints > 0)) {
+    document.addEventListener("mousemove", mouseMoveHandler, false);
+}
 
 window.addEventListener("deviceorientation", handleOrientation, true); // Contrôle gyroscope (mouvement du téléphone)
 
@@ -45,6 +48,7 @@ function handleOrientation(event) {
 // On calcule la position horizontale (x) de la souris, le mouvement est limité à la taille du canva
 // de façon à ce que le panier s'arrête aux bords horizontaux
 function mouseMoveHandler(e) {
+    if (navigator.maxTouchPoints > 0) return;
     var sourisX = e.clientX - canvaJeu.offsetLeft;
     panierX = sourisX - panierW / 2;
     panierX = Math.max(0, Math.min(panierX, canvaJeu.width - panierW));

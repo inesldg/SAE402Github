@@ -16,6 +16,12 @@
     position: fixed;
     top: 0;
     left: 0;
+    /* Mobile : évite le surlignage / callout / comportements tactiles parasites sur le canvas */
+    touch-action: none;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+    user-select: none;
+    -webkit-user-select: none;
 }
 
 html,

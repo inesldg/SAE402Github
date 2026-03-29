@@ -133,21 +133,29 @@ function collisionPanier() {
     }
 }
 
+// Sur un grand écran PC la zone est plus haute en pixels : sans ça, les pommes mettent plus longtemps à descendre (effet « lent »).
+function facteurVitessePourHauteurEcran() {
+    var ref = 720;
+    var f = canvaJeu.height / ref;
+    if (f < 1) f = 1;
+    if (f > 2.2) f = 2.2;
+    return f;
+}
+
 function creerPomme() {
     var type = Math.random();
 
     var pomme = {
         x: Math.random() * (canvaJeu.width - 40),
         y: 0,
-        vitesse: 2 + Math.random() * 3,
+        vitesse: (2 + Math.random() * 3) * 60 * facteurVitessePourHauteurEcran(),
         type: type
     };
 
     pommes.push(pomme); // On insère la variable pomme dans le tableau pommes
 }
 
-// Fonction qui permet de dessiner les pommes
-function dessinerPommes() {
+function dessinerPommes(dt) {
     for (var i = 0; i < pommes.length; i++) {
         var pommeSeule = pommes[i];
 
@@ -163,7 +171,7 @@ function dessinerPommes() {
         }
 
         ctx.drawImage(image, pommeSeule.x, pommeSeule.y, 40, 40);
-        pommeSeule.y += pommeSeule.vitesse;
+        pommeSeule.y += pommeSeule.vitesse * dt;
     }
 }
 
@@ -178,8 +186,14 @@ function dessinerPanier() {
     );
 }
 
-// Fonction qui dessine la trajectoire et empêche la répétition des frame
-function dessiner() {
+var instantFramePrecedent = 0;
+
+// t = horodatage fourni par requestAnimationFrame (simple et fiable pour le delta temps)
+function dessiner(t) {
+    var dt = instantFramePrecedent
+        ? Math.min((t - instantFramePrecedent) / 1000, 0.05)
+        : 1 / 60;
+    instantFramePrecedent = t;
 
     if (modePaysage) {
         // fond sombre
@@ -219,15 +233,14 @@ function dessiner() {
     }
 
     ctx.clearRect(0, 0, canvaJeu.width, canvaJeu.height)
-    dessinerPommes();
+    dessinerPommes(dt);
     dessinerPanier();
     collisionPanier();
     defScore();
     defVies();
     defTimer();
 
-    // Spawn des pommes
-    if (Math.random() < 0.02) {
+    if (Math.random() < 0.02 * 60 * dt) {
         creerPomme();
     }
 
@@ -240,4 +253,4 @@ function dessiner() {
     requestAnimationFrame(dessiner); // La fonction dessiner est exécutée à l'infini
 }
 
-dessiner();
+requestAnimationFrame(dessiner);
