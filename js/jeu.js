@@ -1,5 +1,6 @@
-// Multiplicateur unique pour toutes les pommes (PC + tel). Monter un peu si c’est trop lent.
-var facteurVitesseGlobal = 1.65;
+var facteurVitesseGlobal = 1.65; // vitesse globale des pommes etc
+
+var facteurApparitionPommes = 2; // tentaives de spawn de pommes par secondes
 
 var ecranGameOver = document.getElementById("ecranGameOver");
 var gameOverTitre = document.getElementById("gameOverTitre");
@@ -235,7 +236,7 @@ function dessiner(t) {
     defVies();
     defTimer();
 
-    if (Math.random() < 0.02 * 60 * dt) {
+    if (Math.random() < 0.02 * 60 * dt * facteurApparitionPommes) {
         creerPomme();
     }
 
