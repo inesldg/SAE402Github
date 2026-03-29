@@ -1,3 +1,6 @@
+// Multiplicateur unique pour toutes les pommes (PC + tel). Monter un peu si c’est trop lent.
+var facteurVitesseGlobal = 1.65;
+
 var ecranGameOver = document.getElementById("ecranGameOver");
 var gameOverTitre = document.getElementById("gameOverTitre");
 var gameOverScore = document.getElementById("gameOverScore");
@@ -127,28 +130,20 @@ function collisionPanier() {
             i--;
 
             // Si la fin du jeu vient d'être déclenchée (dernier coeur),
-            // on stoppe pour éviter de modifier le score sur la même frame.
+            // on stoppe pour éviter de modifier le score sur la même frame
             if (gameOver) return;
         }
     }
 }
 
-// Sur un grand écran PC la zone est plus haute en pixels : sans ça, les pommes mettent plus longtemps à descendre (effet « lent »).
-function facteurVitessePourHauteurEcran() {
-    var ref = 720;
-    var f = canvaJeu.height / ref;
-    if (f < 1) f = 1;
-    if (f > 2.2) f = 2.2;
-    return f;
-}
-
 function creerPomme() {
     var type = Math.random();
 
+    // vitesse en px/s : base * facteurVitesseGlobal (identique sur tous les écrans)
     var pomme = {
         x: Math.random() * (canvaJeu.width - 40),
         y: 0,
-        vitesse: (2 + Math.random() * 3) * 60 * facteurVitessePourHauteurEcran(),
+        vitesse: (2 + Math.random() * 3) * 60 * facteurVitesseGlobal,
         type: type
     };
 
