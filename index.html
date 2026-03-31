@@ -12,6 +12,31 @@
 
     <canvas id="monCanva"></canvas>
 
+    <!-- Ecran de consignes au démarrage -->
+    <div id="ecranConsignes" class="ecran-consignes">
+        <h2 class="ecran-consignes__titre">Consignes</h2>
+        <p class="ecran-consignes__texte ecran-consignes__intro">Récolte le plus de pommes possible !</p>
+
+        <div class="ecran-consignes__legende">
+            <div class="legende-item">
+                <img class="legende-item__img" src="sprites/pommeRouge.png" alt="Pomme normale">
+                <div class="legende-item__texte">Pomme rouge: +1</div>
+            </div>
+            <div class="legende-item">
+                <img class="legende-item__img" src="sprites/pommeDoree.png" alt="Pomme dorée">
+                <div class="legende-item__texte">Pomme dorée: +10</div>
+            </div>
+            <div class="legende-item">
+                <img class="legende-item__img" src="sprites/pommePourrie.png" alt="Pomme pourrie">
+                <div class="legende-item__texte">Pomme pourrie: -5 (et -1 vie)</div>
+            </div>
+        </div>
+
+        <p class="ecran-consignes__texte ecran-consignes__temps">Temps imparti: <b>30 secondes</b></p>
+
+        <button id="btnLancerJeu" type="button" class="btn-lancer">Lancer le jeu</button>
+    </div>
+
     <!-- Écran qui s'affiche en cas de fin par manque de vies-->
     <div id="ecranGameOver" class="ecran-fin ecran-fin--popup cache">
         <h2 id="gameOverTitre">JEU PERDU !</h2>

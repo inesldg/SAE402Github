@@ -1,7 +1,5 @@
-// Souris uniquement sur PC pour éviter des comportements parasites sur tel comme un deuxième opanier quand on clique etc
-if (!(navigator.maxTouchPoints > 0)) {
-    document.addEventListener("mousemove", mouseMoveHandler, false);
-}
+// On garde la souris active partout (utile pour test PC même en mode responsive de l'inspecteur).
+document.addEventListener("mousemove", mouseMoveHandler, false);
 
 window.addEventListener("deviceorientation", handleOrientation, true); // Contrôle gyroscope (mouvement du téléphone)
 
@@ -28,10 +26,12 @@ document.addEventListener("click", activerOrientationMobile, { once: true });
 
 // Détection simple "appareil tactile" : utilisé ailleurs (reset orientation)
 var appareilMobile = navigator.maxTouchPoints > 0;
+var gyroscopeActif = false;
 
 function handleOrientation(event) {
     // Si pas de données capteur, ou mode paysage : on ne déplace pas le panier (le jeu affiche un message paysage)
     if (event.gamma === null || modePaysage) return;
+    gyroscopeActif = true;
 
     // 20° pour la sensibilité, permet d'éviter de trop pencher le téléphone car c'est chiant
     var plageInclinaison = 20; 
@@ -48,7 +48,8 @@ function handleOrientation(event) {
 // On calcule la position horizontale (x) de la souris, le mouvement est limité à la taille du canva
 // de façon à ce que le panier s'arrête aux bords horizontaux
 function mouseMoveHandler(e) {
-    if (navigator.maxTouchPoints > 0) return;
+    // Sur vrai mobile avec gyroscope actif, on ignore la souris pour éviter les événements "fantômes" au tap.
+    if (appareilMobile && gyroscopeActif) return;
     var sourisX = e.clientX - canvaJeu.offsetLeft;
     panierX = sourisX - panierW / 2;
     panierX = Math.max(0, Math.min(panierX, canvaJeu.width - panierW));

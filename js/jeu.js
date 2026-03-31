@@ -13,6 +13,11 @@ var victoireScore = document.getElementById("victoireScore");
 var btnRejouerVictoire = document.getElementById("btnRejouerVictoire");
 var btnContinuerHistoire = document.getElementById("btnContinuerHistoire");
 
+// Ecran de consignes au démarrage
+var ecranConsignes = document.getElementById("ecranConsignes");
+var btnLancerJeu = document.getElementById("btnLancerJeu");
+var jeuCommence = false;
+
 if (btnRejouerGameOver) {
     btnRejouerGameOver.addEventListener("click", function () {
         document.location.reload();
@@ -49,6 +54,65 @@ function afficherVictoire(message) {
     ecranVictoire.classList.remove("cache");
 }
 
+// Démarre une nouvelle partie après le clic sur "Lancer le jeu"
+function demarrerJeu() {
+    if (jeuCommence) return;
+    jeuCommence = true;
+
+    if (ecranConsignes) ecranConsignes.classList.add("cache");
+
+    // Cache les écrans de fin si jamais ils étaient visibles
+    if (ecranGameOver) ecranGameOver.classList.add("cache");
+    if (ecranVictoire) ecranVictoire.classList.add("cache");
+
+    // Reset état du jeu
+    pommes.length = 0;
+    score = 0;
+    scoreFinal = 0;
+    scoreAffiche = 0;
+    vies = 3;
+    tempsRestant = 30;
+    gameOver = false;
+    finParTemps = false;
+
+    // Reset sons "timer"
+    sonUrgence.pause();
+    sonUrgence.currentTime = 0;
+
+    // Active les sons (le clic sur le bouton fait partie du geste utilisateur)
+    if (typeof preparerAudio === "function") {
+        preparerAudio();
+    }
+    musique.play().catch(function () { });
+
+    // Démarre le timer seulement maintenant
+    if (intervalId !== null) {
+        clearInterval(intervalId);
+    }
+    intervalId = setInterval(function () {
+        if (gameOver) return;
+
+        tempsRestant--;
+
+        if (tempsRestant <= 0) {
+            tempsRestant = 0;
+            finParTemps = true;
+            sonUrgence.pause();
+            sonUrgence.currentTime = 0;
+            clearInterval(intervalId);
+            intervalId = null;
+        }
+    }, 1000);
+
+    // Lance la boucle de rendu
+    instantFramePrecedent = 0;
+    requestAnimationFrame(dessiner);
+}
+
+if (btnLancerJeu) {
+    btnLancerJeu.addEventListener("click", demarrerJeu);
+}
+
 // Termine le jeu une seule fois (évite les alert/reload en double)
 function terminerJeu(message) {
     if (gameOver) return; // garde-fou anti-doubles déclenchements
@@ -73,22 +137,7 @@ function terminerJeu(message) {
     }
 }
 
-// Permet d'ajouter un timer, et le jeu s'arrête à la fin du timer
-intervalId = setInterval(function () {
-    if (gameOver) return;
-
-    tempsRestant--;
-
-    if (tempsRestant <= 0) {
-        tempsRestant = 0;
-        finParTemps = true;
-        sonUrgence.pause();
-        sonUrgence.currentTime = 0;
-        clearInterval(intervalId);
-        intervalId = null;
-    }
-
-}, 1000);
+// Le timer est démarré dans demarrerJeu()
 
 function collisionPanier() {
     var margeCollisionX = 8;
@@ -249,4 +298,4 @@ function dessiner(t) {
     requestAnimationFrame(dessiner); // La fonction dessiner est exécutée à l'infini
 }
 
-requestAnimationFrame(dessiner);
+// La boucle commence uniquement après le clic sur "Lancer le jeu"
