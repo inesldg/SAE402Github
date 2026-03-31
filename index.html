@@ -35,6 +35,20 @@
         <p class="ecran-consignes__texte ecran-consignes__temps">Temps imparti: <b>30 secondes</b></p>
 
         <button id="btnLancerJeu" type="button" class="btn-lancer">Lancer le jeu</button>
+        <button id="btnRevoirCinematique" type="button" class="btn-lancer btn-revoir-cinematique">Revoir la cinématique</button>
+    </div>
+
+    <!-- Cinématique affichée une seule fois après les consignes -->
+    <div id="ecranCinematique" class="ecran-cinematique cache" aria-live="polite">
+        <div class="ecran-cinematique__scene">
+            <img id="imagePommierCinematique" src="sprites/pommier.png" alt="Pommier">
+            <img class="pomme-cine pomme-cine--1" src="sprites/pommeRouge.png" alt="">
+            <img class="pomme-cine pomme-cine--2" src="sprites/pommeRouge.png" alt="">
+            <img class="pomme-cine pomme-cine--3" src="sprites/pommeRouge.png" alt="">
+        </div>
+
+        <p id="texteCinematique" class="ecran-cinematique__texte">Secoue ton téléphone !</p>
+        <button id="btnSecouerArbre" type="button" class="ecran-cinematique__btn-secret" aria-label="Déclencher la secousse (test PC)"></button>
     </div>
 
     <!-- Écran qui s'affiche en cas de fin par manque de vies-->

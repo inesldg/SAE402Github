@@ -262,3 +262,148 @@ body::before {
 .btn-lancer:active {
     transform: scale(0.98);
 }
+
+.btn-revoir-cinematique {
+    margin-top: 2px;
+    font-size: 1.1rem;
+    background: #e7e7e7;
+}
+
+/* --- Ecran cinématique avant le jeu --- */
+.ecran-cinematique {
+    position: fixed;
+    inset: 0;
+    z-index: 35;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    padding: 20px;
+    text-align: center;
+    color: #fff;
+    
+    background-image: url('../sprites/cinematique.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+
+    overflow: hidden;
+}
+
+.ecran-cinematique.cache {
+    display: none !important;
+}
+
+.ecran-cinematique__scene {
+    position: relative;
+    width: min(96vw, 760px);
+    max-width: 96vw;
+}
+
+#imagePommierCinematique {
+    width: 100%;
+    max-height: 72vh;
+    height: auto;
+    display: block;
+    object-fit: contain;
+    margin-top: 22vh;
+    transform-origin: 50% 80%;
+}
+
+#imagePommierCinematique.secoue {
+    animation: secouer-arbre 0.25s ease-in-out 5;
+}
+
+.pomme-cine {
+    position: absolute;
+    width: clamp(22px, 5vw, 34px);
+    height: auto;
+    opacity: 0;
+    transform: translateY(0) rotate(0deg);
+    pointer-events: none;
+}
+
+.pomme-cine--1 {
+    top: 33%;
+    left: 36%;
+}
+
+.pomme-cine--2 {
+    top: 29%;
+    left: 53%;
+}
+
+.pomme-cine--3 {
+    top: 38%;
+    left: 62%;
+}
+
+.pomme-cine.tomber {
+    opacity: 1;
+    animation: pomme-tombe 1.2s ease-in forwards;
+}
+
+.ecran-cinematique__texte {
+    font-family: "Inter", sans-serif;
+    font-size: clamp(1rem, 3.8vw, 1.15rem);
+    max-width: min(90vw, 420px);
+    line-height: 1.35;
+}
+
+.ecran-cinematique__btn-secret {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    width: 52px;
+    height: 52px;
+    border: none;
+    background: transparent;
+    opacity: 0;
+    cursor: pointer;
+    z-index: 5;
+}
+
+.ecran-cinematique.transition-bas {
+    animation: cine-vers-jeu 0.8s ease-in forwards;
+}
+
+@keyframes secouer-arbre {
+    0% {
+        transform: rotate(0deg) translateX(0);
+    }
+    25% {
+        transform: rotate(-4deg) translateX(-3px);
+    }
+    50% {
+        transform: rotate(4deg) translateX(3px);
+    }
+    75% {
+        transform: rotate(-2deg) translateX(-2px);
+    }
+    100% {
+        transform: rotate(0deg) translateX(0);
+    }
+}
+
+@keyframes pomme-tombe {
+    0% {
+        opacity: 1;
+        transform: translateY(0) rotate(0deg);
+    }
+    100% {
+        opacity: 0;
+        transform: translateY(46vh) rotate(320deg);
+    }
+}
+
+@keyframes cine-vers-jeu {
+    0% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(100%);
+        opacity: 0;
+    }
+}

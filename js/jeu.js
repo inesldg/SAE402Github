@@ -16,7 +16,18 @@ var btnContinuerHistoire = document.getElementById("btnContinuerHistoire");
 // Ecran de consignes au démarrage
 var ecranConsignes = document.getElementById("ecranConsignes");
 var btnLancerJeu = document.getElementById("btnLancerJeu");
+var btnRevoirCinematique = document.getElementById("btnRevoirCinematique");
+var ecranCinematique = document.getElementById("ecranCinematique");
+var imagePommierCinematique = document.getElementById("imagePommierCinematique");
+var texteCinematique = document.getElementById("texteCinematique");
+var btnSecouerArbre = document.getElementById("btnSecouerArbre");
+var pommesCinematique = document.querySelectorAll(".pomme-cine");
 var jeuCommence = false;
+var cleCinematiqueVue = "cinematiqueSecouerArbreVue";
+var cinematiqueSecousseDeclenchee = false;
+var ecouteSecousseActive = false;
+var derniereAcceleration = null;
+var dernierSecouement = 0;
 
 if (btnRejouerGameOver) {
     btnRejouerGameOver.addEventListener("click", function () {
@@ -52,6 +63,127 @@ function afficherVictoire(message) {
     musiqueFinEcran.currentTime = 0;
     musiqueFinEcran.play().catch(function () { });
     ecranVictoire.classList.remove("cache");
+}
+
+function cinematiqueDejaVue() {
+    try {
+        return sessionStorage.getItem(cleCinematiqueVue) === "1";
+    } catch (e) {
+        return false;
+    }
+}
+
+function enregistrerCinematiqueCommeVue() {
+    try {
+        sessionStorage.setItem(cleCinematiqueVue, "1");
+    } catch (e) {
+        // Si le stockage est indisponible, on ignore sans bloquer le jeu.
+    }
+}
+
+function demanderPermissionSecousse() {
+    if (
+        typeof DeviceMotionEvent !== "undefined" &&
+        typeof DeviceMotionEvent.requestPermission === "function"
+    ) {
+        DeviceMotionEvent.requestPermission().catch(function () { });
+    }
+}
+
+function arreterEcouteSecousse() {
+    if (!ecouteSecousseActive) return;
+    window.removeEventListener("devicemotion", detecterSecousse);
+    ecouteSecousseActive = false;
+}
+
+function detecterSecousse(event) {
+    if (cinematiqueSecousseDeclenchee) return;
+
+    var acceleration = event.accelerationIncludingGravity || event.acceleration;
+    if (!acceleration) return;
+
+    var x = acceleration.x || 0;
+    var y = acceleration.y || 0;
+    var z = acceleration.z || 0;
+    var maintenant = Date.now();
+
+    if (!derniereAcceleration) {
+        derniereAcceleration = { x: x, y: y, z: z };
+        return;
+    }
+
+    var variation =
+        Math.abs(x - derniereAcceleration.x) +
+        Math.abs(y - derniereAcceleration.y) +
+        Math.abs(z - derniereAcceleration.z);
+
+    derniereAcceleration = { x: x, y: y, z: z };
+
+    if (variation > 22 && maintenant - dernierSecouement > 900) {
+        dernierSecouement = maintenant;
+        lancerAnimationSecousse();
+    }
+}
+
+function lancerAnimationSecousse() {
+    if (!ecranCinematique || cinematiqueSecousseDeclenchee) return;
+    cinematiqueSecousseDeclenchee = true;
+    arreterEcouteSecousse();
+
+    if (texteCinematique) {
+        texteCinematique.textContent = "Bien joué ! Les pommes tombent...";
+    }
+
+    if (imagePommierCinematique) {
+        imagePommierCinematique.classList.remove("secoue");
+        void imagePommierCinematique.offsetWidth;
+        imagePommierCinematique.classList.add("secoue");
+    }
+
+    for (var i = 0; i < pommesCinematique.length; i++) {
+        pommesCinematique[i].classList.add("tomber");
+    }
+
+    window.setTimeout(function () {
+        ecranCinematique.classList.add("transition-bas");
+        enregistrerCinematiqueCommeVue();
+
+        window.setTimeout(function () {
+            ecranCinematique.classList.add("cache");
+            ecranCinematique.classList.remove("transition-bas");
+            demarrerJeu();
+        }, 820);
+    }, 1200);
+}
+
+function afficherCinematique() {
+    if (!ecranCinematique) {
+        demarrerJeu();
+        return;
+    }
+
+    cinematiqueSecousseDeclenchee = false;
+    derniereAcceleration = null;
+    dernierSecouement = 0;
+
+    if (ecranConsignes) ecranConsignes.classList.add("cache");
+    ecranCinematique.classList.remove("cache");
+    ecranCinematique.classList.remove("transition-bas");
+
+    if (imagePommierCinematique) {
+        imagePommierCinematique.classList.remove("secoue");
+    }
+    for (var i = 0; i < pommesCinematique.length; i++) {
+        pommesCinematique[i].classList.remove("tomber");
+    }
+
+    if (texteCinematique) {
+        texteCinematique.textContent = "Secoue ton téléphone !";
+    }
+
+    demanderPermissionSecousse();
+    window.addEventListener("devicemotion", detecterSecousse);
+    ecouteSecousseActive = true;
 }
 
 // Démarre une nouvelle partie après le clic sur "Lancer le jeu"
@@ -110,7 +242,27 @@ function demarrerJeu() {
 }
 
 if (btnLancerJeu) {
-    btnLancerJeu.addEventListener("click", demarrerJeu);
+    btnLancerJeu.addEventListener("click", function () {
+        if (cinematiqueDejaVue()) {
+            demarrerJeu();
+        } else {
+            afficherCinematique();
+        }
+    });
+}
+
+if (btnSecouerArbre) {
+    btnSecouerArbre.addEventListener("click", lancerAnimationSecousse);
+}
+
+if (btnRevoirCinematique) {
+    btnRevoirCinematique.addEventListener("click", function () {
+        try {
+            sessionStorage.removeItem(cleCinematiqueVue);
+        } catch (e) {
+            // Ignore si le stockage n'est pas disponible.
+        }
+    });
 }
 
 // Termine le jeu une seule fois (évite les alert/reload en double)
@@ -153,7 +305,7 @@ function collisionPanier() {
             pommeSeule.x < panierX + panierW + margeCollisionX &&
             pommeSeule.x - 5 > panierX - margeCollisionX && // distance à laquelle la pomme touche le panier sur les côtés (axe X)
             pommeSeule.y < panierY + panierH &&
-            pommeSeule.y + -20 > panierY // distance à laquelle la pomme touche le panier depuis le haut (axe Y)
+            pommeSeule.y + 10 > panierY // distance à laquelle la pomme touche le panier depuis le haut (axe Y)
         ) {
             // SCORE selon type
             if (pommeSeule.type < 0.7) {

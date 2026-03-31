@@ -1,11 +1,9 @@
-* Au chargement : arbre, message qui dit de secouer, 
-puis écran qui descends vers le bas et on récolte 
-les pommes
+*logique de secousse pour le pommier
 
 * Pigeon et mugiwara no qui veulent voler --> 
 système de micro
 sprites pour que le pigeon s'enlève
 
-* finir de clean les scripts
+* finir de clean le code + ajouter commentaires
 
 * tableau des scores

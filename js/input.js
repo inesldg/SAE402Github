@@ -1,5 +1,9 @@
 // On garde la souris active partout (utile pour test PC même en mode responsive de l'inspecteur).
-document.addEventListener("mousemove", mouseMoveHandler, false);
+window.addEventListener("mousemove", mouseMoveHandler, true);
+window.addEventListener("mouseover", mouseMoveHandler, true);
+document.addEventListener("pointermove", pointerMoveHandler, false);
+document.addEventListener("pointerover", pointerMoveHandler, false);
+document.addEventListener("touchmove", touchMoveHandler, { passive: true });
 
 window.addEventListener("deviceorientation", handleOrientation, true); // Contrôle gyroscope (mouvement du téléphone)
 
@@ -48,9 +52,21 @@ function handleOrientation(event) {
 // On calcule la position horizontale (x) de la souris, le mouvement est limité à la taille du canva
 // de façon à ce que le panier s'arrête aux bords horizontaux
 function mouseMoveHandler(e) {
-    // Sur vrai mobile avec gyroscope actif, on ignore la souris pour éviter les événements "fantômes" au tap.
-    if (appareilMobile && gyroscopeActif) return;
-    var sourisX = e.clientX - canvaJeu.offsetLeft;
+    deplacerPanierAvecClientX(e.clientX);
+}
+
+function pointerMoveHandler(e) {
+    if (e.pointerType && e.pointerType !== "mouse") return;
+    deplacerPanierAvecClientX(e.clientX);
+}
+
+function touchMoveHandler(e) {
+    if (!e.touches || !e.touches.length) return;
+    deplacerPanierAvecClientX(e.touches[0].clientX);
+}
+
+function deplacerPanierAvecClientX(clientX) {
+    var sourisX = clientX - canvaJeu.offsetLeft;
     panierX = sourisX - panierW / 2;
     panierX = Math.max(0, Math.min(panierX, canvaJeu.width - panierW));
 }
