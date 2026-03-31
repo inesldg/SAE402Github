@@ -341,11 +341,20 @@ function initialiserDetectionSouffle() {
     if (microDemandeEffectuee) return;
     microDemandeEffectuee = true;
 
-    navigator.mediaDevices.getUserMedia({ audio: true }).then(function (flux) {
+    navigator.mediaDevices.getUserMedia({
+        audio: {
+            echoCancellation: false,
+            noiseSuppression: false,
+            autoGainControl: false
+        }
+    }).then(function (flux) {
         var ContexteAudio = window.AudioContext || window.webkitAudioContext;
         if (!ContexteAudio) return;
 
         microContexte = new ContexteAudio();
+        if (typeof microContexte.resume === "function") {
+            microContexte.resume().catch(function () { });
+        }
         var source = microContexte.createMediaStreamSource(flux);
         microAnalyseur = microContexte.createAnalyser();
         microAnalyseur.fftSize = 512;
@@ -354,6 +363,18 @@ function initialiserDetectionSouffle() {
         microPret = true;
         enregistrerEtatMicro("granted");
         mettreAJourTexteEtatMicro();
+
+        // Certains navigateurs baissent/coupent la sortie audio lors de l'activation micro.
+        // On relance explicitement l'audio du jeu après autorisation.
+        if (typeof preparerAudio === "function") {
+            preparerAudio();
+        }
+        if (jeuCommence && !gameOver) {
+            musique.play().catch(function () { });
+            if (tempsRestant <= 10 && tempsRestant > 0) {
+                sonUrgence.play().catch(function () { });
+            }
+        }
     }).catch(function () {
         // Si la permission micro est refusée, le pigeon reste un danger normal.
         enregistrerEtatMicro("denied");
