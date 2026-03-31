@@ -73,12 +73,22 @@ function cinematiqueDejaVue() {
     }
 }
 
+function mettreAJourBoutonRevoirCinematique() {
+    if (!btnRevoirCinematique) return;
+    if (cinematiqueDejaVue()) {
+        btnRevoirCinematique.classList.remove("cache");
+    } else {
+        btnRevoirCinematique.classList.add("cache");
+    }
+}
+
 function enregistrerCinematiqueCommeVue() {
     try {
         sessionStorage.setItem(cleCinematiqueVue, "1");
     } catch (e) {
         // Si le stockage est indisponible, on ignore sans bloquer le jeu.
     }
+    mettreAJourBoutonRevoirCinematique();
 }
 
 function demanderPermissionSecousse() {
@@ -262,8 +272,11 @@ if (btnRevoirCinematique) {
         } catch (e) {
             // Ignore si le stockage n'est pas disponible.
         }
+        mettreAJourBoutonRevoirCinematique();
     });
 }
+
+mettreAJourBoutonRevoirCinematique();
 
 // Termine le jeu une seule fois (évite les alert/reload en double)
 function terminerJeu(message) {
