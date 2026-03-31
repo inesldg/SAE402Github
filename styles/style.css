@@ -218,6 +218,17 @@ body::before {
     margin-top: 32px;
 }
 
+.ecran-consignes__micro {
+    margin-top: 4px;
+    max-width: min(92vw, 440px);
+}
+
+.ecran-consignes__micro-etat {
+    font-weight: 700;
+    color: #ffd54f;
+    min-height: 1.2em;
+}
+
 .ecran-consignes__legende {
     display: flex;
     flex-wrap: wrap;
@@ -267,6 +278,11 @@ body::before {
     margin-top: 2px;
     font-size: 1.1rem;
     background: #e7e7e7;
+}
+
+.btn-micro {
+    margin-top: 2px;
+    background: #f1f1f1;
 }
 
 /* --- Ecran cinématique avant le jeu --- */

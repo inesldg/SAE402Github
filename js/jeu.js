@@ -17,6 +17,8 @@ var btnContinuerHistoire = document.getElementById("btnContinuerHistoire");
 var ecranConsignes = document.getElementById("ecranConsignes");
 var btnLancerJeu = document.getElementById("btnLancerJeu");
 var btnRevoirCinematique = document.getElementById("btnRevoirCinematique");
+var btnAutoriserMicro = document.getElementById("btnAutoriserMicro");
+var etatMicroConsignes = document.getElementById("etatMicroConsignes");
 var ecranCinematique = document.getElementById("ecranCinematique");
 var imagePommierCinematique = document.getElementById("imagePommierCinematique");
 var texteCinematique = document.getElementById("texteCinematique");
@@ -28,6 +30,16 @@ var cinematiqueSecousseDeclenchee = false;
 var ecouteSecousseActive = false;
 var derniereAcceleration = null;
 var dernierSecouement = 0;
+var pigeon = null;
+var prochainApparitionPigeonMs = 0;
+var microAnalyseur = null;
+var microDonnees = null;
+var microContexte = null;
+var microPret = false;
+var microDemandeEffectuee = false;
+var bruitAmbiant = 0.015;
+var clePermissionMicro = "permissionMicroJeu";
+var souffleConsecutif = 0;
 
 if (btnRejouerGameOver) {
     btnRejouerGameOver.addEventListener("click", function () {
@@ -80,6 +92,67 @@ function mettreAJourBoutonRevoirCinematique() {
     } else {
         btnRevoirCinematique.classList.add("cache");
     }
+}
+
+function lireEtatMicroSauvegarde() {
+    try {
+        return localStorage.getItem(clePermissionMicro) || "inconnu";
+    } catch (e) {
+        return "inconnu";
+    }
+}
+
+function enregistrerEtatMicro(etat) {
+    try {
+        localStorage.setItem(clePermissionMicro, etat);
+    } catch (e) {
+        // stockage indisponible: on continue sans bloquer le jeu
+    }
+}
+
+function mettreAJourTexteEtatMicro() {
+    if (!etatMicroConsignes) return;
+    if (btnAutoriserMicro) {
+        btnAutoriserMicro.classList.remove("cache");
+    }
+
+    if (microPret) {
+        etatMicroConsignes.textContent = "Micro autorisé";
+        if (btnAutoriserMicro) {
+            btnAutoriserMicro.classList.add("cache");
+        }
+        return;
+    }
+
+    var etat = lireEtatMicroSauvegarde();
+    if (etat === "granted") {
+        etatMicroConsignes.textContent = "Micro déjà autorisé.";
+        if (btnAutoriserMicro) {
+            btnAutoriserMicro.classList.add("cache");
+        }
+    } else if (etat === "denied") {
+        etatMicroConsignes.textContent = "Micro refusé : active-le dans les réglages du navigateur.";
+    } else {
+        etatMicroConsignes.textContent = "Micro non configuré.";
+    }
+}
+
+function verifierPermissionMicroExistante() {
+    if (!navigator.permissions || !navigator.permissions.query) {
+        mettreAJourTexteEtatMicro();
+        return;
+    }
+
+    navigator.permissions.query({ name: "microphone" }).then(function (statut) {
+        if (statut.state === "granted") {
+            enregistrerEtatMicro("granted");
+        } else if (statut.state === "denied") {
+            enregistrerEtatMicro("denied");
+        }
+        mettreAJourTexteEtatMicro();
+    }).catch(function () {
+        mettreAJourTexteEtatMicro();
+    });
 }
 
 function enregistrerCinematiqueCommeVue() {
@@ -149,6 +222,10 @@ function lancerAnimationSecousse() {
         void imagePommierCinematique.offsetWidth;
         imagePommierCinematique.classList.add("secoue");
     }
+    if (typeof sonSecoussePommier !== "undefined") {
+        sonSecoussePommier.currentTime = 0;
+        sonSecoussePommier.play().catch(function () { });
+    }
 
     for (var i = 0; i < pommesCinematique.length; i++) {
         pommesCinematique[i].classList.add("tomber");
@@ -216,6 +293,8 @@ function demarrerJeu() {
     tempsRestant = 30;
     gameOver = false;
     finParTemps = false;
+    pigeon = null;
+    prochainApparitionPigeonMs = Date.now() + 2500 + Math.random() * 3500;
 
     // Reset sons "timer"
     sonUrgence.pause();
@@ -224,6 +303,9 @@ function demarrerJeu() {
     // Active les sons (le clic sur le bouton fait partie du geste utilisateur)
     if (typeof preparerAudio === "function") {
         preparerAudio();
+    }
+    if (lireEtatMicroSauvegarde() === "granted") {
+        initialiserDetectionSouffle();
     }
     musique.play().catch(function () { });
 
@@ -251,6 +333,194 @@ function demarrerJeu() {
     requestAnimationFrame(dessiner);
 }
 
+function initialiserDetectionSouffle() {
+    if (microPret || !navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        mettreAJourTexteEtatMicro();
+        return;
+    }
+    if (microDemandeEffectuee) return;
+    microDemandeEffectuee = true;
+
+    navigator.mediaDevices.getUserMedia({ audio: true }).then(function (flux) {
+        var ContexteAudio = window.AudioContext || window.webkitAudioContext;
+        if (!ContexteAudio) return;
+
+        microContexte = new ContexteAudio();
+        var source = microContexte.createMediaStreamSource(flux);
+        microAnalyseur = microContexte.createAnalyser();
+        microAnalyseur.fftSize = 512;
+        source.connect(microAnalyseur);
+        microDonnees = new Uint8Array(microAnalyseur.fftSize);
+        microPret = true;
+        enregistrerEtatMicro("granted");
+        mettreAJourTexteEtatMicro();
+    }).catch(function () {
+        // Si la permission micro est refusée, le pigeon reste un danger normal.
+        enregistrerEtatMicro("denied");
+        mettreAJourTexteEtatMicro();
+    }).finally(function () {
+        microDemandeEffectuee = false;
+    });
+}
+
+function niveauSouffle() {
+    if (!microPret || !microAnalyseur || !microDonnees) return 0;
+
+    microAnalyseur.getByteTimeDomainData(microDonnees);
+    var somme = 0;
+
+    for (var i = 0; i < microDonnees.length; i++) {
+        var centree = (microDonnees[i] - 128) / 128;
+        somme += centree * centree;
+    }
+
+    return Math.sqrt(somme / microDonnees.length);
+}
+
+function creerPigeon() {
+    var cote = Math.random() < 0.5 ? "gauche" : "droite";
+    var largeur = 92;
+    var hauteur = 66;
+    var xBord = cote === "gauche" ? 0 : canvaJeu.width - largeur;
+
+    pigeon = {
+        cote: cote,
+        largeur: largeur,
+        hauteur: hauteur,
+        x: xBord,
+        y: 96,
+        typeFuite: "",
+        vitesseFuiteX: cote === "gauche" ? -360 : 360,
+        vitesseFuiteY: -300,
+        tempsApparition: Date.now(),
+        tempsReactionSouffle: 650,
+        tempsAvantVol: 3000,
+        enFuite: false,
+        aVole: false
+    };
+    souffleConsecutif = 0;
+
+    if (typeof sonPigeonSansPomme !== "undefined") {
+        sonPigeonSansPomme.currentTime = 0;
+        sonPigeonSansPomme.play().catch(function () { });
+    }
+}
+
+function faireVolerPigeon() {
+    if (!pigeon || pigeon.enFuite || gameOver) return;
+    pigeon.typeFuite = "souffle";
+    pigeon.enFuite = true;
+    if (typeof sonPigeonSansPomme !== "undefined") {
+        sonPigeonSansPomme.currentTime = 0;
+        sonPigeonSansPomme.play().catch(function () { });
+    }
+}
+
+function pigeonVoleUnePomme() {
+    if (!pigeon || pigeon.aVole || gameOver) return;
+    pigeon.aVole = true;
+    pigeon.typeFuite = "vol";
+
+    if (pommes.length > 0) {
+        pommes.splice(0, 1);
+    }
+
+    if (typeof sonPigeonVolePomme !== "undefined") {
+        sonPigeonVolePomme.currentTime = 0;
+        sonPigeonVolePomme.play().catch(function () { });
+    }
+
+    vies--;
+    if (vies <= 0) {
+        terminerJeu("PARTIE PERDUE :(");
+    }
+}
+
+function mettreAJourPigeon(dt) {
+    if (gameOver) return;
+
+    var maintenant = Date.now();
+
+    if (!pigeon && maintenant >= prochainApparitionPigeonMs) {
+        creerPigeon();
+    }
+
+    if (!pigeon) return;
+
+    if (!pigeon.enFuite) {
+        pigeon.x = pigeon.cote === "gauche" ? 0 : canvaJeu.width - pigeon.largeur;
+
+        var tempsSurEcran = maintenant - pigeon.tempsApparition;
+        var niveau = niveauSouffle();
+        bruitAmbiant = bruitAmbiant * 0.985 + niveau * 0.015;
+        var seuilSouffle = Math.max(0.085, bruitAmbiant * 3.6);
+
+        if (tempsSurEcran >= pigeon.tempsReactionSouffle && niveau > seuilSouffle) {
+            souffleConsecutif++;
+        } else {
+            souffleConsecutif = 0;
+        }
+
+        // Evite les déclenchements instantanés dus au bruit ambiant.
+        if (souffleConsecutif >= 3) {
+            faireVolerPigeon();
+            souffleConsecutif = 0;
+        } else if (tempsSurEcran >= pigeon.tempsAvantVol) {
+            pigeonVoleUnePomme();
+            pigeon.enFuite = true;
+            souffleConsecutif = 0;
+        }
+    } else {
+        if (pigeon.typeFuite === "vol") {
+            var versDroite = pigeon.cote === "gauche";
+            pigeon.x += (versDroite ? 420 : -420) * dt;
+        } else {
+            // Soufflé: retourne en arrière (animation actuelle)
+            pigeon.x += pigeon.vitesseFuiteX * dt;
+            pigeon.y += pigeon.vitesseFuiteY * dt;
+        }
+    }
+
+    if (
+        pigeon.x < -140 ||
+        pigeon.x > canvaJeu.width + 140 ||
+        pigeon.y < -140
+    ) {
+        pigeon = null;
+        prochainApparitionPigeonMs = Date.now() + 5000 + Math.random() * 6000;
+    }
+}
+
+function dessinerPigeon() {
+    if (!pigeon) return;
+
+    if (spritePigeon && spritePigeon.complete && spritePigeon.naturalWidth > 0) {
+        if (pigeon.cote === "gauche") {
+            ctx.drawImage(spritePigeon, pigeon.x, pigeon.y, pigeon.largeur, pigeon.hauteur);
+        } else {
+            ctx.save();
+            ctx.translate(pigeon.x + pigeon.largeur / 2, pigeon.y + pigeon.hauteur / 2);
+            ctx.scale(-1, 1);
+            ctx.drawImage(
+                spritePigeon,
+                -pigeon.largeur / 2,
+                -pigeon.hauteur / 2,
+                pigeon.largeur,
+                pigeon.hauteur
+            );
+            ctx.restore();
+        }
+    }
+
+    if (!pigeon.enFuite) {
+        ctx.font = "22px 'Jersey 10'";
+        ctx.fillStyle = "#ffffff";
+        ctx.textAlign = "center";
+        ctx.fillText("Souffle pour chasser le pigeon !", canvaJeu.width / 2, 95);
+        ctx.textAlign = "start";
+    }
+}
+
 if (btnLancerJeu) {
     btnLancerJeu.addEventListener("click", function () {
         if (cinematiqueDejaVue()) {
@@ -276,7 +546,14 @@ if (btnRevoirCinematique) {
     });
 }
 
+if (btnAutoriserMicro) {
+    btnAutoriserMicro.addEventListener("click", function () {
+        initialiserDetectionSouffle();
+    });
+}
+
 mettreAJourBoutonRevoirCinematique();
+verifierPermissionMicroExistante();
 
 // Termine le jeu une seule fois (évite les alert/reload en double)
 function terminerJeu(message) {
@@ -443,7 +720,9 @@ function dessiner(t) {
     }
 
     ctx.clearRect(0, 0, canvaJeu.width, canvaJeu.height)
+    mettreAJourPigeon(dt);
     dessinerPommes(dt);
+    dessinerPigeon();
     dessinerPanier();
     collisionPanier();
     defScore();

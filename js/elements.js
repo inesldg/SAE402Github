@@ -44,6 +44,10 @@ spritePommePourrie.src = "sprites/pommePourrie.png"; // Sprite pomme pourrie
 var spritePanier = new Image();
 spritePanier.src = "sprites/panier.png"; // Sprite panier qui récupère les pommes
 
+// Définition du sprite du pigeon (nouvelle difficulté)
+var spritePigeon = new Image();
+spritePigeon.src = "sprites/pigeon.png";
+
 // Définition des sprites de coeurs pour les vies
 var coeurPlein = new Image();
 coeurPlein.src = "sprites/coeur_plein.png"; // Sprite coeurs restants

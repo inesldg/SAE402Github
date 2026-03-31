@@ -1,5 +1,3 @@
-*logique de secousse pour le pommier
-
 * Pigeon et mugiwara no qui veulent voler --> 
 système de micro
 sprites pour que le pigeon s'enlève
@@ -7,3 +5,8 @@ sprites pour que le pigeon s'enlève
 * finir de clean le code + ajouter commentaires
 
 * tableau des scores
+
+
+*son pour le pigeon
+*son pour le pommier
+
