@@ -45,6 +45,8 @@ var signatureSouffleAmbiante = 0.12;
 var messagePigeon = "";
 var messagePigeonJusquaMs = 0;
 var messagePigeonCouleur = "#7CFF8F";
+var calibrationMicroJusquaMs = 0;
+var niveauPicRecent = 0;
 
 if (btnRejouerGameOver) {
     btnRejouerGameOver.addEventListener("click", function () {
@@ -370,6 +372,8 @@ function initialiserDetectionSouffle() {
         microDonnees = new Uint8Array(microAnalyseur.fftSize);
         microDonneesFrequences = new Uint8Array(microAnalyseur.frequencyBinCount);
         microPret = true;
+        calibrationMicroJusquaMs = Date.now() + 1200;
+        niveauPicRecent = 0;
         enregistrerEtatMicro("granted");
         mettreAJourTexteEtatMicro();
 
@@ -522,16 +526,23 @@ function mettreAJourPigeon(dt) {
         var tempsSurEcran = maintenant - pigeon.tempsApparition;
         var niveau = niveauSouffle();
         var signature = signatureSouffle();
-        bruitAmbiant = bruitAmbiant * 0.985 + niveau * 0.015;
-        signatureSouffleAmbiante = signatureSouffleAmbiante * 0.985 + signature * 0.015;
-        var seuilSouffle = Math.max(0.06, bruitAmbiant * 2.6);
-        var seuilSignatureSouffle = Math.max(0.11, signatureSouffleAmbiante * 1.18);
+        var coefLissage = maintenant < calibrationMicroJusquaMs ? 0.05 : 0.015;
+        bruitAmbiant = bruitAmbiant * (1 - coefLissage) + niveau * coefLissage;
+        signatureSouffleAmbiante = signatureSouffleAmbiante * (1 - coefLissage) + signature * coefLissage;
+        niveauPicRecent = Math.max(niveauPicRecent * 0.92, niveau);
+
+        var mobile = navigator.maxTouchPoints > 0;
+        var seuilSouffle = mobile
+            ? Math.max(0.035, bruitAmbiant * 1.75)
+            : Math.max(0.055, bruitAmbiant * 2.4);
+        var seuilSignatureSouffle = Math.max(0.1, signatureSouffleAmbiante * 1.15);
         var souffleFort = niveau > seuilSouffle;
         var souffleTypique = signature > seuilSignatureSouffle;
+        var picSouffle = niveauPicRecent > seuilSouffle * 1.25;
 
         if (
             tempsSurEcran >= pigeon.tempsReactionSouffle &&
-            (souffleFort || souffleTypique)
+            (souffleFort || souffleTypique || picSouffle)
         ) {
             souffleConsecutif++;
         } else {
