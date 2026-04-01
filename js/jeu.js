@@ -524,13 +524,14 @@ function mettreAJourPigeon(dt) {
         var signature = signatureSouffle();
         bruitAmbiant = bruitAmbiant * 0.985 + niveau * 0.015;
         signatureSouffleAmbiante = signatureSouffleAmbiante * 0.985 + signature * 0.015;
-        var seuilSouffle = Math.max(0.085, bruitAmbiant * 3.6);
-        var seuilSignatureSouffle = Math.max(0.16, signatureSouffleAmbiante * 1.35);
+        var seuilSouffle = Math.max(0.06, bruitAmbiant * 2.6);
+        var seuilSignatureSouffle = Math.max(0.11, signatureSouffleAmbiante * 1.18);
+        var souffleFort = niveau > seuilSouffle;
+        var souffleTypique = signature > seuilSignatureSouffle;
 
         if (
             tempsSurEcran >= pigeon.tempsReactionSouffle &&
-            niveau > seuilSouffle &&
-            signature > seuilSignatureSouffle
+            (souffleFort || souffleTypique)
         ) {
             souffleConsecutif++;
         } else {
@@ -538,7 +539,7 @@ function mettreAJourPigeon(dt) {
         }
 
         // Evite les déclenchements instantanés dus au bruit ambiant.
-        if (souffleConsecutif >= 3) {
+        if (souffleConsecutif >= 2) {
             faireVolerPigeon("souffle");
             souffleConsecutif = 0;
         } else if (tempsSurEcran >= pigeon.tempsAvantVol) {
@@ -593,7 +594,7 @@ function dessinerPigeon() {
         ctx.fillStyle = "#ffffff";
         ctx.textAlign = "center";
         if (microPret) {
-            ctx.fillText("Souffle ou tape le pigeon !", canvaJeu.width / 2, 95);
+            ctx.fillText("Fait fuir le pigeon !", canvaJeu.width / 2, 95);
         } else {
             ctx.fillText("Tape le pigeon pour le chasser !", canvaJeu.width / 2, 95);
         }
