@@ -819,29 +819,7 @@ function dessiner(t) {
     instantFramePrecedent = t;
 
     if (modePaysage) {
-        // fond sombre
         ctx.clearRect(0, 0, canvaJeu.width, canvaJeu.height);
-        ctx.fillStyle = "rgba(0, 0, 0, 0.59)";
-        ctx.fillRect(0, 0, canvaJeu.width, canvaJeu.height);
-
-        // texte
-        ctx.textAlign = "center";
-        ctx.font = "32px 'Jersey 10'";
-        ctx.fillStyle = "white";
-
-        ctx.fillText(
-            "Veuillez placer votre téléphone en mode portrait",
-            canvaJeu.width / 2,
-            canvaJeu.height / 2 - 10
-        );
-
-        ctx.fillText(
-            "pour une meilleure expérience de jeu ;)",
-            canvaJeu.width / 2,
-            canvaJeu.height / 2 + 20
-        );
-
-        ctx.textAlign = "start";
         requestAnimationFrame(dessiner);
         return;
     }
