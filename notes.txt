@@ -1,11 +1,3 @@
 * finir de clean le code + ajouter commentaires
 
 * tableau des scores
-
-
-*son pour le pigeon x2
-*son pour le pommier
-
-*option pour pas ajouter un micro
-
-*changer sprite pigeon

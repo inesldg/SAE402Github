@@ -40,6 +40,9 @@ var microDemandeEffectuee = false;
 var bruitAmbiant = 0.015;
 var clePermissionMicro = "permissionMicroJeu";
 var souffleConsecutif = 0;
+var messagePigeon = "";
+var messagePigeonJusquaMs = 0;
+var messagePigeonCouleur = "#7CFF8F";
 
 if (btnRejouerGameOver) {
     btnRejouerGameOver.addEventListener("click", function () {
@@ -204,8 +207,15 @@ function detecterSecousse(event) {
 
     if (variation > 22 && maintenant - dernierSecouement > 900) {
         dernierSecouement = maintenant;
+        jouerSonSecoussePommier();
         lancerAnimationSecousse();
     }
+}
+
+function jouerSonSecoussePommier() {
+    if (typeof sonSecoussePommier === "undefined") return;
+    sonSecoussePommier.currentTime = 0;
+    sonSecoussePommier.play().catch(function () { });
 }
 
 function lancerAnimationSecousse() {
@@ -221,10 +231,6 @@ function lancerAnimationSecousse() {
         imagePommierCinematique.classList.remove("secoue");
         void imagePommierCinematique.offsetWidth;
         imagePommierCinematique.classList.add("secoue");
-    }
-    if (typeof sonSecoussePommier !== "undefined") {
-        sonSecoussePommier.currentTime = 0;
-        sonSecoussePommier.play().catch(function () { });
     }
 
     for (var i = 0; i < pommesCinematique.length; i++) {
@@ -427,10 +433,17 @@ function creerPigeon() {
     }
 }
 
-function faireVolerPigeon() {
+function afficherMessagePigeon(message, dureeMs, couleur) {
+    messagePigeon = message;
+    messagePigeonJusquaMs = Date.now() + (dureeMs || 1100);
+    messagePigeonCouleur = couleur || "#7CFF8F";
+}
+
+function faireVolerPigeon(raison) {
     if (!pigeon || pigeon.enFuite || gameOver) return;
     pigeon.typeFuite = "souffle";
     pigeon.enFuite = true;
+    afficherMessagePigeon("Bien joué ! Le pigeon s'enfuit.", 1200, "#7CFF8F");
     if (typeof sonPigeonSansPomme !== "undefined") {
         sonPigeonSansPomme.currentTime = 0;
         sonPigeonSansPomme.play().catch(function () { });
@@ -441,6 +454,7 @@ function pigeonVoleUnePomme() {
     if (!pigeon || pigeon.aVole || gameOver) return;
     pigeon.aVole = true;
     pigeon.typeFuite = "vol";
+    afficherMessagePigeon("Raté ! Le pigeon vole une pomme.", 1400, "#FF5C5C");
 
     if (pommes.length > 0) {
         pommes.splice(0, 1);
@@ -484,7 +498,7 @@ function mettreAJourPigeon(dt) {
 
         // Evite les déclenchements instantanés dus au bruit ambiant.
         if (souffleConsecutif >= 3) {
-            faireVolerPigeon();
+            faireVolerPigeon("souffle");
             souffleConsecutif = 0;
         } else if (tempsSurEcran >= pigeon.tempsAvantVol) {
             pigeonVoleUnePomme();
@@ -537,8 +551,50 @@ function dessinerPigeon() {
         ctx.font = "22px 'Jersey 10'";
         ctx.fillStyle = "#ffffff";
         ctx.textAlign = "center";
-        ctx.fillText("Souffle pour chasser le pigeon !", canvaJeu.width / 2, 95);
+        if (microPret) {
+            ctx.fillText("Souffle ou tape le pigeon !", canvaJeu.width / 2, 95);
+        } else {
+            ctx.fillText("Tape le pigeon pour le chasser !", canvaJeu.width / 2, 95);
+        }
         ctx.textAlign = "start";
+    }
+}
+
+function dessinerMessagePigeon() {
+    if (!messagePigeon || Date.now() > messagePigeonJusquaMs) return;
+
+    ctx.font = "24px 'Jersey 10'";
+    ctx.fillStyle = messagePigeonCouleur;
+    ctx.textAlign = "center";
+    ctx.fillText(messagePigeon, canvaJeu.width / 2, 128);
+    ctx.textAlign = "start";
+}
+
+function positionDansCanvasDepuisEvenement(e) {
+    var rect = canvaJeu.getBoundingClientRect();
+    var clientX = e.clientX;
+    var clientY = e.clientY;
+
+    if ((clientX === undefined || clientY === undefined) && e.touches && e.touches.length) {
+        clientX = e.touches[0].clientX;
+        clientY = e.touches[0].clientY;
+    }
+
+    return {
+        x: clientX - rect.left,
+        y: clientY - rect.top
+    };
+}
+
+function gererTapPigeonSansMicro(e) {
+    if (!pigeon || pigeon.enFuite || gameOver) return;
+
+    var pos = positionDansCanvasDepuisEvenement(e);
+    var dansX = pos.x >= pigeon.x && pos.x <= pigeon.x + pigeon.largeur;
+    var dansY = pos.y >= pigeon.y && pos.y <= pigeon.y + pigeon.hauteur;
+
+    if (dansX && dansY) {
+        faireVolerPigeon("tap");
     }
 }
 
@@ -553,7 +609,10 @@ if (btnLancerJeu) {
 }
 
 if (btnSecouerArbre) {
-    btnSecouerArbre.addEventListener("click", lancerAnimationSecousse);
+    btnSecouerArbre.addEventListener("click", function () {
+        jouerSonSecoussePommier();
+        lancerAnimationSecousse();
+    });
 }
 
 if (btnRevoirCinematique) {
@@ -572,6 +631,9 @@ if (btnAutoriserMicro) {
         initialiserDetectionSouffle();
     });
 }
+
+canvaJeu.addEventListener("pointerdown", gererTapPigeonSansMicro);
+canvaJeu.addEventListener("touchstart", gererTapPigeonSansMicro, { passive: true });
 
 mettreAJourBoutonRevoirCinematique();
 verifierPermissionMicroExistante();
@@ -744,6 +806,7 @@ function dessiner(t) {
     mettreAJourPigeon(dt);
     dessinerPommes(dt);
     dessinerPigeon();
+    dessinerMessagePigeon();
     dessinerPanier();
     collisionPanier();
     defScore();

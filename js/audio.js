@@ -42,6 +42,21 @@ musique.volume = 1; // volume de la musique de fond
 // à cause de la politique qui bloque automatiquement
 var audioAction = false;
 var audioActivationEnCours = false;
+
+function rechaufferSon(audio) {
+    if (!audio) return;
+    var ancienVolume = audio.volume;
+    audio.volume = 0;
+    audio.currentTime = 0;
+    audio.play().then(function () {
+        audio.pause();
+        audio.currentTime = 0;
+        audio.volume = ancienVolume;
+    }).catch(function () {
+        audio.volume = ancienVolume;
+    });
+}
+
 function preparerAudio() {
     if (audioAction || audioActivationEnCours) return;
     audioActivationEnCours = true;
@@ -52,6 +67,7 @@ function preparerAudio() {
             sonPomme.pause();
             sonPomme.currentTime = 0;
             sonPomme.volume = volumePommes;
+            rechaufferSon(sonSecoussePommier);
 
             audioAction = true; // activé seulement si succès réel
             audioActivationEnCours = false;
@@ -65,6 +81,7 @@ function preparerAudio() {
         sonPomme.pause();
         sonPomme.currentTime = 0;
         sonPomme.volume = volumePommes;
+        rechaufferSon(sonSecoussePommier);
         audioAction = true;
         audioActivationEnCours = false;
         musique.play().catch(function () { });
