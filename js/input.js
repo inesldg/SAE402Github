@@ -31,6 +31,7 @@ document.addEventListener("click", activerOrientationMobile, { once: true });
 // Détection simple "appareil tactile" : utilisé ailleurs (reset orientation)
 var appareilMobile = navigator.maxTouchPoints > 0;
 var gyroscopeActif = false;
+var ecranOrientation = document.getElementById("ecranOrientation");
 
 function handleOrientation(event) {
     // Si pas de données capteur, ou mode paysage : on ne déplace pas le panier (le jeu affiche un message paysage)
@@ -52,10 +53,12 @@ function handleOrientation(event) {
 // On calcule la position horizontale (x) de la souris, le mouvement est limité à la taille du canva
 // de façon à ce que le panier s'arrête aux bords horizontaux
 function mouseMoveHandler(e) {
+    if (appareilMobile) return;
     deplacerPanierAvecClientX(e.clientX);
 }
 
 function pointerMoveHandler(e) {
+    if (appareilMobile) return;
     if (e.pointerType && e.pointerType !== "mouse") return;
     deplacerPanierAvecClientX(e.clientX);
 }
@@ -66,6 +69,7 @@ function touchMoveHandler(e) {
 }
 
 function deplacerPanierAvecClientX(clientX) {
+    if (typeof clientX !== "number" || !isFinite(clientX)) return;
     var sourisX = clientX - canvaJeu.offsetLeft;
     panierX = sourisX - panierW / 2;
     panierX = Math.max(0, Math.min(panierX, canvaJeu.width - panierW));
@@ -80,6 +84,14 @@ function orientationPaysage() {
 function verifierOrientation() {
     var etaitPaysage = modePaysage;
     modePaysage = orientationPaysage();
+
+    if (ecranOrientation) {
+        if (modePaysage) {
+            ecranOrientation.classList.remove("cache");
+        } else {
+            ecranOrientation.classList.add("cache");
+        }
+    }
 
     // Sur téléphone, retour paysage -> portrait = nouvelle partie
     if (appareilMobile && etaitPaysage && !modePaysage) {

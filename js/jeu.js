@@ -34,12 +34,14 @@ var pigeon = null;
 var prochainApparitionPigeonMs = 0;
 var microAnalyseur = null;
 var microDonnees = null;
+var microDonneesFrequences = null;
 var microContexte = null;
 var microPret = false;
 var microDemandeEffectuee = false;
 var bruitAmbiant = 0.015;
 var clePermissionMicro = "permissionMicroJeu";
 var souffleConsecutif = 0;
+var signatureSouffleAmbiante = 0.12;
 var messagePigeon = "";
 var messagePigeonJusquaMs = 0;
 var messagePigeonCouleur = "#7CFF8F";
@@ -129,14 +131,14 @@ function mettreAJourTexteEtatMicro() {
 
     var etat = lireEtatMicroSauvegarde();
     if (etat === "granted") {
-        etatMicroConsignes.textContent = "Micro déjà autorisé.";
+        etatMicroConsignes.textContent = "Micro déjà autorisé";
         if (btnAutoriserMicro) {
             btnAutoriserMicro.classList.add("cache");
         }
     } else if (etat === "denied") {
-        etatMicroConsignes.textContent = "Micro refusé : active-le dans les réglages du navigateur.";
+        etatMicroConsignes.textContent = "Micro refusé : active-le dans les réglages du navigateur";
     } else {
-        etatMicroConsignes.textContent = "Micro non configuré.";
+        etatMicroConsignes.textContent = "Micro non configuré";
     }
 }
 
@@ -366,6 +368,7 @@ function initialiserDetectionSouffle() {
         microAnalyseur.fftSize = 512;
         source.connect(microAnalyseur);
         microDonnees = new Uint8Array(microAnalyseur.fftSize);
+        microDonneesFrequences = new Uint8Array(microAnalyseur.frequencyBinCount);
         microPret = true;
         enregistrerEtatMicro("granted");
         mettreAJourTexteEtatMicro();
@@ -402,6 +405,37 @@ function niveauSouffle() {
     }
 
     return Math.sqrt(somme / microDonnees.length);
+}
+
+function signatureSouffle() {
+    if (!microPret || !microAnalyseur || !microDonneesFrequences) return 0;
+
+    microAnalyseur.getByteFrequencyData(microDonneesFrequences);
+
+    var n = microDonneesFrequences.length;
+    if (!n) return 0;
+
+    // Le souffle contient souvent plus de bruit dans les hautes fréquences que la voix criée.
+    var debutMoyen = Math.floor(n * 0.08);
+    var finMoyen = Math.floor(n * 0.32);
+    var debutHaut = Math.floor(n * 0.45);
+    var finHaut = Math.floor(n * 0.9);
+
+    var sommeMoyen = 0;
+    var sommeHaut = 0;
+    var i;
+
+    for (i = debutMoyen; i < finMoyen; i++) {
+        sommeMoyen += microDonneesFrequences[i];
+    }
+    for (i = debutHaut; i < finHaut; i++) {
+        sommeHaut += microDonneesFrequences[i];
+    }
+
+    var moyenneMoyen = sommeMoyen / Math.max(1, finMoyen - debutMoyen);
+    var moyenneHaut = sommeHaut / Math.max(1, finHaut - debutHaut);
+
+    return moyenneHaut / Math.max(1, moyenneMoyen);
 }
 
 function creerPigeon() {
@@ -487,10 +521,17 @@ function mettreAJourPigeon(dt) {
 
         var tempsSurEcran = maintenant - pigeon.tempsApparition;
         var niveau = niveauSouffle();
+        var signature = signatureSouffle();
         bruitAmbiant = bruitAmbiant * 0.985 + niveau * 0.015;
+        signatureSouffleAmbiante = signatureSouffleAmbiante * 0.985 + signature * 0.015;
         var seuilSouffle = Math.max(0.085, bruitAmbiant * 3.6);
+        var seuilSignatureSouffle = Math.max(0.16, signatureSouffleAmbiante * 1.35);
 
-        if (tempsSurEcran >= pigeon.tempsReactionSouffle && niveau > seuilSouffle) {
+        if (
+            tempsSurEcran >= pigeon.tempsReactionSouffle &&
+            niveau > seuilSouffle &&
+            signature > seuilSignatureSouffle
+        ) {
             souffleConsecutif++;
         } else {
             souffleConsecutif = 0;

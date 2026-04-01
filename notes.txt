@@ -1,3 +1,7 @@
 * finir de clean le code + ajouter commentaires
 
 * tableau des scores
+
+* pouvoir souffler
+
+* ne pas pouvoir toucher le panier etc
