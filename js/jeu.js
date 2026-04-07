@@ -534,12 +534,12 @@ function mettreAJourPigeon(dt) {
 
         var mobile = navigator.maxTouchPoints > 0;
         var seuilSouffle = mobile
-            ? Math.max(0.042, bruitAmbiant * 1.95)
-            : Math.max(0.065, bruitAmbiant * 2.7);
-        var seuilSignatureSouffle = Math.max(0.12, signatureSouffleAmbiante * 1.22);
+            ? Math.max(0.05, bruitAmbiant * 2.2)
+            : Math.max(0.078, bruitAmbiant * 3.05);
+        var seuilSignatureSouffle = Math.max(0.14, signatureSouffleAmbiante * 1.3);
         var souffleFort = niveau > seuilSouffle;
         var souffleTypique = signature > seuilSignatureSouffle;
-        var picSouffle = niveauPicRecent > seuilSouffle * 1.32;
+        var picSouffle = niveauPicRecent > seuilSouffle * 1.4;
 
         if (
             tempsSurEcran >= pigeon.tempsReactionSouffle &&
