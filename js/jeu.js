@@ -287,6 +287,7 @@ function afficherCinematique() {
 function demarrerJeu() {
     if (jeuCommence) return;
     jeuCommence = true;
+    document.dispatchEvent(new CustomEvent("sae402:game-start", { bubbles: true }));
 
     if (ecranConsignes) ecranConsignes.classList.add("cache");
 
@@ -533,12 +534,12 @@ function mettreAJourPigeon(dt) {
 
         var mobile = navigator.maxTouchPoints > 0;
         var seuilSouffle = mobile
-            ? Math.max(0.035, bruitAmbiant * 1.75)
-            : Math.max(0.055, bruitAmbiant * 2.4);
-        var seuilSignatureSouffle = Math.max(0.1, signatureSouffleAmbiante * 1.15);
+            ? Math.max(0.042, bruitAmbiant * 1.95)
+            : Math.max(0.065, bruitAmbiant * 2.7);
+        var seuilSignatureSouffle = Math.max(0.12, signatureSouffleAmbiante * 1.22);
         var souffleFort = niveau > seuilSouffle;
         var souffleTypique = signature > seuilSignatureSouffle;
-        var picSouffle = niveauPicRecent > seuilSouffle * 1.25;
+        var picSouffle = niveauPicRecent > seuilSouffle * 1.32;
 
         if (
             tempsSurEcran >= pigeon.tempsReactionSouffle &&
@@ -695,6 +696,8 @@ verifierPermissionMicroExistante();
 function terminerJeu(message) {
     if (gameOver) return; // garde-fou anti-doubles déclenchements
     gameOver = true;
+    jeuCommence = false;
+    document.dispatchEvent(new CustomEvent("sae402:game-end", { bubbles: true }));
     scoreFinal = scoreAffiche; // score réellement affiché à l'écran
 
     if (intervalId !== null) {

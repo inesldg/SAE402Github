@@ -1,3 +1,16 @@
 * finir de clean le code + ajouter commentaires
 
-* tableau des scores
+* micro très sensible --> à changer
+
+
+
+PLateforme:
+- PWA (disponible hors ligne)
+- tableau des scores
+- menu pour skip les jeux
+
+- simplifier code commentaires etc
+
+
+* cinématique pour quand le jeu chapeau se lance 
+qui explique pourquoi le chapeau etc
