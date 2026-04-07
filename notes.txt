@@ -1,9 +1,3 @@
-* finir de clean le code + ajouter commentaires
-
-* micro très sensible --> à changer
-
-
-
 PLateforme:
 - PWA (disponible hors ligne)
 - tableau des scores
