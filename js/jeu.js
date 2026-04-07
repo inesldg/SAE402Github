@@ -34,38 +34,43 @@ var pigeon = null;
 var prochainApparitionPigeonMs = 0;
 var microAnalyseur = null;
 var microDonnees = null;
-var microDonneesFrequences = null;
 var microContexte = null;
 var microPret = false;
 var microDemandeEffectuee = false;
 var bruitAmbiant = 0.015;
+var seuilMicroMobileMin = 0.055;
+var seuilMicroDesktopMin = 0.085;
+var multiplicateurSeuilMobile = 2.4;
+var multiplicateurSeuilDesktop = 3.2;
+var nbFramesSoufflePourValider = 3;
 var clePermissionMicro = "permissionMicroJeu";
 var souffleConsecutif = 0;
-var signatureSouffleAmbiante = 0.12;
 var messagePigeon = "";
 var messagePigeonJusquaMs = 0;
 var messagePigeonCouleur = "#7CFF8F";
-var calibrationMicroJusquaMs = 0;
-var niveauPicRecent = 0;
 
+// Relance le jeu quand on appuie sur rejouer après avoir perdu
 if (btnRejouerGameOver) {
     btnRejouerGameOver.addEventListener("click", function () {
         document.location.reload();
     });
 }
 
+// Relance le jeu quand on appuie sur rejouer après avoir gagné
 if (btnRejouerVictoire) {
     btnRejouerVictoire.addEventListener("click", function () {
         document.location.reload();
     });
 }
 
+// Bouton pour continuer dans l'histoire et donc lancer la cinématique
 if (btnContinuerHistoire) {
     btnContinuerHistoire.addEventListener("click", function () {
         // Bouton temporaire: pas de redirection pour l'instant
     });
 }
 
+// Afficher le message de game over avec le score etc
 function afficherGameOver(message) {
     if (!ecranGameOver || !gameOverTitre || !gameOverScore) return;
     gameOverTitre.textContent = message;
@@ -75,6 +80,7 @@ function afficherGameOver(message) {
     ecranGameOver.classList.remove("cache");
 }
 
+// Afficher écran de victoire
 function afficherVictoire(message) {
     if (!ecranVictoire || !victoireTitre || !victoireScore) return;
     victoireTitre.textContent = message;
@@ -84,6 +90,7 @@ function afficherVictoire(message) {
     ecranVictoire.classList.remove("cache");
 }
 
+// Stocke si l'utilisateur a vu la cinématique ou pas pour pas la réaficher à chaque fois
 function cinematiqueDejaVue() {
     try {
         return sessionStorage.getItem(cleCinematiqueVue) === "1";
@@ -92,6 +99,7 @@ function cinematiqueDejaVue() {
     }
 }
 
+// Si l'utilisateur clique sur revoir la cinématique alors on l'enlève du cache
 function mettreAJourBoutonRevoirCinematique() {
     if (!btnRevoirCinematique) return;
     if (cinematiqueDejaVue()) {
@@ -101,6 +109,7 @@ function mettreAJourBoutonRevoirCinematique() {
     }
 }
 
+// Vérifie si un permission micro a déjà été enregistré
 function lireEtatMicroSauvegarde() {
     try {
         return localStorage.getItem(clePermissionMicro) || "inconnu";
@@ -109,6 +118,7 @@ function lireEtatMicroSauvegarde() {
     }
 }
 
+// On enregsitre si le micro est activé ou pas etc
 function enregistrerEtatMicro(etat) {
     try {
         localStorage.setItem(clePermissionMicro, etat);
@@ -117,6 +127,7 @@ function enregistrerEtatMicro(etat) {
     }
 }
 
+// Le texte change selon l'état du micro choisi par l'utilisateur "micro activé" etc
 function mettreAJourTexteEtatMicro() {
     if (!etatMicroConsignes) return;
     if (btnAutoriserMicro) {
@@ -144,6 +155,7 @@ function mettreAJourTexteEtatMicro() {
     }
 }
 
+// Vérifications pour les permissions du micro
 function verifierPermissionMicroExistante() {
     if (!navigator.permissions || !navigator.permissions.query) {
         mettreAJourTexteEtatMicro();
@@ -162,6 +174,7 @@ function verifierPermissionMicroExistante() {
     });
 }
 
+// On enregistre la cinématique comme déjà vue quand elle est déjà vue
 function enregistrerCinematiqueCommeVue() {
     try {
         sessionStorage.setItem(cleCinematiqueVue, "1");
@@ -171,6 +184,7 @@ function enregistrerCinematiqueCommeVue() {
     mettreAJourBoutonRevoirCinematique();
 }
 
+// On demande la permission de pouvoir secouer
 function demanderPermissionSecousse() {
     if (
         typeof DeviceMotionEvent !== "undefined" &&
@@ -186,6 +200,7 @@ function arreterEcouteSecousse() {
     ecouteSecousseActive = false;
 }
 
+// Fonction qui détecte si l'appareil a été secoué ou pas
 function detecterSecousse(event) {
     if (cinematiqueSecousseDeclenchee) return;
 
@@ -216,12 +231,14 @@ function detecterSecousse(event) {
     }
 }
 
+// Lorsqye le téléphone est secoué on joue le son qui va avec
 function jouerSonSecoussePommier() {
     if (typeof sonSecoussePommier === "undefined") return;
     sonSecoussePommier.currentTime = 0;
     sonSecoussePommier.play().catch(function () { });
 }
 
+// Lorsque le téléphone est secoué on lance l'animation qui va avec
 function lancerAnimationSecousse() {
     if (!ecranCinematique || cinematiqueSecousseDeclenchee) return;
     cinematiqueSecousseDeclenchee = true;
@@ -253,6 +270,7 @@ function lancerAnimationSecousse() {
     }, 1200);
 }
 
+// Affiche la cinématique
 function afficherCinematique() {
     if (!ecranCinematique) {
         demarrerJeu();
@@ -344,6 +362,7 @@ function demarrerJeu() {
     requestAnimationFrame(dessiner);
 }
 
+// Fonction qui détecte le soiuffle et le bruit, la sensibilité de détection etc
 function initialiserDetectionSouffle() {
     if (microPret || !navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
         mettreAJourTexteEtatMicro();
@@ -371,10 +390,8 @@ function initialiserDetectionSouffle() {
         microAnalyseur.fftSize = 512;
         source.connect(microAnalyseur);
         microDonnees = new Uint8Array(microAnalyseur.fftSize);
-        microDonneesFrequences = new Uint8Array(microAnalyseur.frequencyBinCount);
         microPret = true;
-        calibrationMicroJusquaMs = Date.now() + 1200;
-        niveauPicRecent = 0;
+        souffleConsecutif = 0;
         enregistrerEtatMicro("granted");
         mettreAJourTexteEtatMicro();
 
@@ -398,6 +415,7 @@ function initialiserDetectionSouffle() {
     });
 }
 
+// Sensibilité de détection du souffle/ bruit
 function niveauSouffle() {
     if (!microPret || !microAnalyseur || !microDonnees) return 0;
 
@@ -412,37 +430,7 @@ function niveauSouffle() {
     return Math.sqrt(somme / microDonnees.length);
 }
 
-function signatureSouffle() {
-    if (!microPret || !microAnalyseur || !microDonneesFrequences) return 0;
-
-    microAnalyseur.getByteFrequencyData(microDonneesFrequences);
-
-    var n = microDonneesFrequences.length;
-    if (!n) return 0;
-
-    // Le souffle contient souvent plus de bruit dans les hautes fréquences que la voix criée.
-    var debutMoyen = Math.floor(n * 0.08);
-    var finMoyen = Math.floor(n * 0.32);
-    var debutHaut = Math.floor(n * 0.45);
-    var finHaut = Math.floor(n * 0.9);
-
-    var sommeMoyen = 0;
-    var sommeHaut = 0;
-    var i;
-
-    for (i = debutMoyen; i < finMoyen; i++) {
-        sommeMoyen += microDonneesFrequences[i];
-    }
-    for (i = debutHaut; i < finHaut; i++) {
-        sommeHaut += microDonneesFrequences[i];
-    }
-
-    var moyenneMoyen = sommeMoyen / Math.max(1, finMoyen - debutMoyen);
-    var moyenneHaut = sommeHaut / Math.max(1, finHaut - debutHaut);
-
-    return moyenneHaut / Math.max(1, moyenneMoyen);
-}
-
+// Création du méchant pigeon
 function creerPigeon() {
     var cote = Math.random() < 0.5 ? "gauche" : "droite";
     var largeur = 92;
@@ -472,12 +460,14 @@ function creerPigeon() {
     }
 }
 
+// Affichage du message pigeon
 function afficherMessagePigeon(message, dureeMs, couleur) {
     messagePigeon = message;
     messagePigeonJusquaMs = Date.now() + (dureeMs || 1100);
     messagePigeonCouleur = couleur || "#7CFF8F";
 }
 
+// Le pigeon s'envole si on a fait du bruit
 function faireVolerPigeon(raison) {
     if (!pigeon || pigeon.enFuite || gameOver) return;
     pigeon.typeFuite = "souffle";
@@ -489,6 +479,7 @@ function faireVolerPigeon(raison) {
     }
 }
 
+// Le pigeon vole une pomme car on a pas fait assez de bruit
 function pigeonVoleUnePomme() {
     if (!pigeon || pigeon.aVole || gameOver) return;
     pigeon.aVole = true;
@@ -510,6 +501,7 @@ function pigeonVoleUnePomme() {
     }
 }
 
+// Mise à jour de si le pigeon a volé une pomme ou pas et si on a perdu une vie etc
 function mettreAJourPigeon(dt) {
     if (gameOver) return;
 
@@ -526,32 +518,25 @@ function mettreAJourPigeon(dt) {
 
         var tempsSurEcran = maintenant - pigeon.tempsApparition;
         var niveau = niveauSouffle();
-        var signature = signatureSouffle();
-        var coefLissage = maintenant < calibrationMicroJusquaMs ? 0.05 : 0.015;
-        bruitAmbiant = bruitAmbiant * (1 - coefLissage) + niveau * coefLissage;
-        signatureSouffleAmbiante = signatureSouffleAmbiante * (1 - coefLissage) + signature * coefLissage;
-        niveauPicRecent = Math.max(niveauPicRecent * 0.92, niveau);
+        // Moyenne simple du bruit ambiant pour adapter le seuil au téléphone de l'utilisateur.
+        bruitAmbiant = bruitAmbiant * 0.97 + niveau * 0.03;
 
         var mobile = navigator.maxTouchPoints > 0;
         var seuilSouffle = mobile
-            ? Math.max(0.05, bruitAmbiant * 2.2)
-            : Math.max(0.078, bruitAmbiant * 3.05);
-        var seuilSignatureSouffle = Math.max(0.14, signatureSouffleAmbiante * 1.3);
-        var souffleFort = niveau > seuilSouffle;
-        var souffleTypique = signature > seuilSignatureSouffle;
-        var picSouffle = niveauPicRecent > seuilSouffle * 1.4;
+            ? Math.max(seuilMicroMobileMin, bruitAmbiant * multiplicateurSeuilMobile)
+            : Math.max(seuilMicroDesktopMin, bruitAmbiant * multiplicateurSeuilDesktop);
 
         if (
             tempsSurEcran >= pigeon.tempsReactionSouffle &&
-            (souffleFort || souffleTypique || picSouffle)
+            niveau > seuilSouffle
         ) {
             souffleConsecutif++;
         } else {
             souffleConsecutif = 0;
         }
 
-        // Evite les déclenchements instantanés dus au bruit ambiant.
-        if (souffleConsecutif >= 2) {
+        // Il faut plusieurs frames de suite au-dessus du seuil pour éviter les faux déclenchements.
+        if (souffleConsecutif >= nbFramesSoufflePourValider) {
             faireVolerPigeon("souffle");
             souffleConsecutif = 0;
         } else if (tempsSurEcran >= pigeon.tempsAvantVol) {
@@ -580,6 +565,7 @@ function mettreAJourPigeon(dt) {
     }
 }
 
+// Affichage du méchant pigeon
 function dessinerPigeon() {
     if (!pigeon) return;
 
@@ -614,6 +600,7 @@ function dessinerPigeon() {
     }
 }
 
+// Affichage du message et de la couleur etc
 function dessinerMessagePigeon() {
     if (!messagePigeon || Date.now() > messagePigeonJusquaMs) return;
 
@@ -640,6 +627,7 @@ function positionDansCanvasDepuisEvenement(e) {
     };
 }
 
+// Fonction qui gère la chasse du pigeon si l'utilisateur n'a pas activé son micro
 function gererTapPigeonSansMicro(e) {
     if (!pigeon || pigeon.enFuite || gameOver) return;
 
@@ -652,6 +640,7 @@ function gererTapPigeonSansMicro(e) {
     }
 }
 
+// Gère le clic sur le bouton pour le lancement du jeu
 if (btnLancerJeu) {
     btnLancerJeu.addEventListener("click", function () {
         if (cinematiqueDejaVue()) {
@@ -662,6 +651,7 @@ if (btnLancerJeu) {
     });
 }
 
+// Gère le clic sur le bouton caché pour secouer l'arbre
 if (btnSecouerArbre) {
     btnSecouerArbre.addEventListener("click", function () {
         jouerSonSecoussePommier();
@@ -669,6 +659,7 @@ if (btnSecouerArbre) {
     });
 }
 
+// Gère quand l'utilisateur clique sur revoir la cinématique
 if (btnRevoirCinematique) {
     btnRevoirCinematique.addEventListener("click", function () {
         try {
@@ -680,19 +671,21 @@ if (btnRevoirCinematique) {
     });
 }
 
+// Gère le clic sur le bouton pour autoriser le micro
 if (btnAutoriserMicro) {
     btnAutoriserMicro.addEventListener("click", function () {
         initialiserDetectionSouffle();
     });
 }
 
+// Si le micro n'a pas été activé alors, détection de l'appui sur tel pour taper el pigeon
 canvaJeu.addEventListener("pointerdown", gererTapPigeonSansMicro);
 canvaJeu.addEventListener("touchstart", gererTapPigeonSansMicro, { passive: true });
 
-mettreAJourBoutonRevoirCinematique();
-verifierPermissionMicroExistante();
+mettreAJourBoutonRevoirCinematique(); //majs pour éviter les bugs
+verifierPermissionMicroExistante(); //majs pour éviter les bugs
 
-// Termine le jeu une seule fois (évite les alert/reload en double)
+// Termine le jeu une seule fois
 function terminerJeu(message) {
     if (gameOver) return; // garde-fou anti-doubles déclenchements
     gameOver = true;
@@ -720,6 +713,7 @@ function terminerJeu(message) {
 
 // Le timer est démarré dans demarrerJeu()
 
+// Fonctrion de collisions entre le panier et les pommes
 function collisionPanier() {
     var margeCollisionX = 8;
 
@@ -767,6 +761,7 @@ function collisionPanier() {
     }
 }
 
+// Création des pommes
 function creerPomme() {
     var type = Math.random();
 
@@ -781,6 +776,7 @@ function creerPomme() {
     pommes.push(pomme); // On insère la variable pomme dans le tableau pommes
 }
 
+// Dessin des pommes pour les afficher
 function dessinerPommes(dt) {
     for (var i = 0; i < pommes.length; i++) {
         var pommeSeule = pommes[i];

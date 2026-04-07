@@ -38,7 +38,7 @@ var musique = new Audio("sons/musique.mp3"); // musique de fond
 musique.preload = "auto";
 musique.volume = 1; // volume de la musique de fond
 
-// Fonction qui permet d'activer le son avec l'action d'un utilisateur (click, doigt sur l'écran)... 
+// Fonction qui permet d'activer le son avec l'action d'un utilisateur (clic, doigt sur l'écran)... 
 // à cause de la politique qui bloque automatiquement
 var audioAction = false;
 var audioActivationEnCours = false;

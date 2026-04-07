@@ -1,4 +1,3 @@
-/* @import url('https://fonts.googleapis.com/css2?family=Jersey+10&family=Jersey+20&display=swap'); */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@700&family=Jersey+10&family=Jersey+20&display=swap');
 
 :root {
@@ -52,7 +51,6 @@ body::before {
     background-repeat: no-repeat;
 
     filter: blur(2px) brightness(0.5);
-    /* blur + assombrissement pour plus de visibilité */
     z-index: -1;
 }
 
@@ -85,26 +83,24 @@ body::before {
     letter-spacing: 1px;
 }
 
-.ecran-fin--popup {
+.ecran-fin-popup {
     justify-content: center;
     padding-top: 0;
     gap: 10px;
 }
 
-/* Fin par timer : fond prairie net (comme le jeu, sans blur) + bloc centré au milieu */
+/* Fin par timer */
 #ecranVictoire {
     justify-content: center;
     align-items: center;
-    /* Marge haute suffisante (safe area iPhone) : évite que le titre soit coupé — pas de translateY sur le texte */
     padding: max(28px, env(safe-area-inset-top, 0px) + 20px) 20px 24px;
     box-sizing: border-box;
     overflow: visible;
-    /* Remplace entièrement le fond sombre de .ecran-fin — prairie nette, pas de blur */
-    background: linear-gradient(rgba(0, 0, 0, 0.18), rgba(0, 0, 0, 0.22)),
-        url("../sprites/prairie.png") center center / cover no-repeat;
+    background: linear-gradient(rgba(0, 0, 0, 0.18), rgba(0, 0, 0, 0.22)), /*fond sombre*/
+    url("../sprites/prairie.png") center center / cover no-repeat;
 }
 
-.ecran-victoire__contenu {
+.ecran-victoire_contenu {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -114,7 +110,7 @@ body::before {
     max-width: min(420px, 92vw);
 }
 
-/* Titre + score : pas de translateY (sinon coupure avec overflow du viewport) */
+/* Titre et score */
 #ecranVictoire #victoireTitre {
     margin-bottom: 6px;
     line-height: 1.15;
@@ -126,7 +122,7 @@ body::before {
 }
 
 /* Boutons empilés : Rejouer au-dessus, Continuer l'histoire en dessous */
-#ecranVictoire .ecran-fin__actions {
+#ecranVictoire .ecran-fin_actions {
     flex-direction: column;
     flex-wrap: nowrap;
     align-items: stretch;
@@ -161,7 +157,7 @@ body::before {
     text-align: center;
 }
 
-.ecran-fin__actions {
+.ecran-fin_actions {
     display: flex;
     gap: 12px;
     flex-wrap: wrap;
@@ -192,7 +188,7 @@ body::before {
     height: auto;
 }
 
-/* --- Ecran de consignes au démarrage --- */
+/* Ecran de consignes au démarrage */
 .ecran-consignes {
     position: fixed;
     inset: 0;
@@ -208,44 +204,43 @@ body::before {
     color: #fff;
 }
 
-/* Important : quand on ajoute "cache", on doit vraiment masquer l'écran de consignes */
 .ecran-consignes.cache {
     display: none !important;
 }
 
-.ecran-consignes__titre {
+.ecran-consignes_titre {
     font-family: "Jersey 10", sans-serif;
     font-size: 2.6rem;
     letter-spacing: 2px;
     margin-bottom: 6px;
 }
 
-.ecran-consignes__texte {
+.ecran-consignes_texte {
     font-family: "Inter", sans-serif;
     font-size: 1rem;
 }
 
-.ecran-consignes__intro {
+.ecran-consignes_intro {
     margin-top: -22px;
     margin-bottom: 16px;
 }
 
-.ecran-consignes__temps {
+.ecran-consignes_temps {
     margin-top: 32px;
 }
 
-.ecran-consignes__micro {
+.ecran-consignes_micro {
     margin-top: 4px;
     max-width: min(92vw, 440px);
 }
 
-.ecran-consignes__micro-etat {
+.ecran-consignes_micro-etat {
     font-weight: 700;
     color: #ffd54f;
     min-height: 1.2em;
 }
 
-.ecran-consignes__legende {
+.ecran-consignes_legende {
     display: flex;
     flex-wrap: wrap;
     gap: 12px;
@@ -263,13 +258,13 @@ body::before {
     background: rgba(20, 20, 20, 0.6);
 }
 
-.legende-item__img {
+.legende-item_img {
     width: 44px;
     height: 44px;
     object-fit: contain;
 }
 
-.legende-item__texte {
+.legende-item_texte {
     font-family: "Inter", sans-serif;
     font-size: 1rem;
 }
@@ -301,7 +296,7 @@ body::before {
     background: #f1f1f1;
 }
 
-/* --- Ecran cinématique avant le jeu --- */
+/* Ecran cinématique avant le jeu */
 .ecran-cinematique {
     position: fixed;
     inset: 0;
@@ -314,7 +309,7 @@ body::before {
     padding: 20px;
     text-align: center;
     color: #fff;
-    
+
     background-image: url('../sprites/cinematique.png');
     background-size: cover;
     background-position: center;
@@ -327,7 +322,7 @@ body::before {
     display: none !important;
 }
 
-.ecran-cinematique__scene {
+.ecran-cinematique_scene {
     position: relative;
     width: min(96vw, 760px);
     max-width: 96vw;
@@ -356,17 +351,17 @@ body::before {
     pointer-events: none;
 }
 
-.pomme-cine--1 {
+.pomme-cine-1 {
     top: 33%;
     left: 36%;
 }
 
-.pomme-cine--2 {
+.pomme-cine-2 {
     top: 29%;
     left: 53%;
 }
 
-.pomme-cine--3 {
+.pomme-cine-3 {
     top: 38%;
     left: 62%;
 }
@@ -376,14 +371,14 @@ body::before {
     animation: pomme-tombe 1.2s ease-in forwards;
 }
 
-.ecran-cinematique__texte {
+.ecran-cinematique_texte {
     font-family: "Inter", sans-serif;
     font-size: clamp(1rem, 3.8vw, 1.15rem);
     max-width: min(90vw, 420px);
     line-height: 1.35;
 }
 
-.ecran-cinematique__btn-secret {
+.ecran-cinematique_btn-secret {
     position: absolute;
     top: 8px;
     left: 8px;
@@ -404,15 +399,19 @@ body::before {
     0% {
         transform: rotate(0deg) translateX(0);
     }
+
     25% {
         transform: rotate(-4deg) translateX(-3px);
     }
+
     50% {
         transform: rotate(4deg) translateX(3px);
     }
+
     75% {
         transform: rotate(-2deg) translateX(-2px);
     }
+
     100% {
         transform: rotate(0deg) translateX(0);
     }
@@ -423,6 +422,7 @@ body::before {
         opacity: 1;
         transform: translateY(0) rotate(0deg);
     }
+
     100% {
         opacity: 0;
         transform: translateY(46vh) rotate(320deg);
@@ -434,6 +434,7 @@ body::before {
         transform: translateY(0);
         opacity: 1;
     }
+
     100% {
         transform: translateY(100%);
         opacity: 0;
@@ -447,25 +448,25 @@ body::before {
         padding: 16px;
     }
 
-    .ecran-consignes__titre {
+    .ecran-consignes_titre {
         font-size: 2.2rem;
         margin-bottom: 2px;
     }
 
-    .ecran-consignes__texte {
+    .ecran-consignes_texte {
         font-size: 0.92rem;
     }
 
-    .ecran-consignes__intro {
+    .ecran-consignes_intro {
         margin-top: -10px;
         margin-bottom: 10px;
     }
 
-    .ecran-consignes__temps {
+    .ecran-consignes_temps {
         margin-top: 14px;
     }
 
-    .ecran-consignes__legende {
+    .ecran-consignes_legende {
         gap: 8px;
     }
 
@@ -474,12 +475,12 @@ body::before {
         padding: 9px;
     }
 
-    .legende-item__img {
+    .legende-item_img {
         width: 44px;
         height: 44px;
     }
 
-    .legende-item__texte {
+    .legende-item_texte {
         font-size: 0.9rem;
     }
 

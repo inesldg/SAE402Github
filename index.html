@@ -13,30 +13,30 @@
 
     <!-- Ecran de consignes au démarrage -->
     <div id="ecranConsignes" class="ecran-consignes">
-        <h2 class="ecran-consignes__titre">Consignes</h2>
-        <p class="ecran-consignes__texte ecran-consignes__intro">Récolte le plus de pommes possible !</p>
+        <h2 class="ecran-consignes_titre">Consignes</h2>
+        <p class="ecran-consignes_texte ecran-consignes_intro">Récolte le plus de pommes possible !</p>
 
-        <div class="ecran-consignes__legende">
+        <div class="ecran-consignes_legende">
             <div class="legende-item">
-                <img class="legende-item__img" src="sprites/pommeRouge.png" alt="Pomme normale">
-                <div class="legende-item__texte">Pomme rouge: +1</div>
+                <img class="legende-item_img" src="sprites/pommeRouge.png" alt="Pomme normale">
+                <div class="legende-item_texte">Pomme rouge: +1</div>
             </div>
             <div class="legende-item">
-                <img class="legende-item__img" src="sprites/pommeDoree.png" alt="Pomme dorée">
-                <div class="legende-item__texte">Pomme dorée: +10</div>
+                <img class="legende-item_img" src="sprites/pommeDoree.png" alt="Pomme dorée">
+                <div class="legende-item_texte">Pomme dorée: +10</div>
             </div>
             <div class="legende-item">
-                <img class="legende-item__img" src="sprites/pommePourrie.png" alt="Pomme pourrie">
-                <div class="legende-item__texte">Pomme pourrie: -5 (et -1 vie)</div>
+                <img class="legende-item_img" src="sprites/pommePourrie.png" alt="Pomme pourrie">
+                <div class="legende-item_texte">Pomme pourrie: -5 (et -1 vie)</div>
             </div>
         </div>
 
-        <p class="ecran-consignes__texte ecran-consignes__temps">Temps imparti: <b>30 secondes</b></p>
-        <p class="ecran-consignes__texte ecran-consignes__micro">
+        <p class="ecran-consignes_texte ecran-consignes_temps">Temps imparti: <b>30 secondes</b></p>
+        <p class="ecran-consignes_texte ecran-consignes_micro">
             Attention: si un pigeon apparaît, <br> crie ou souffle pour le faire fuir !
         </p>
         <button id="btnAutoriserMicro" type="button" class="btn-lancer btn-micro">Autoriser le micro</button>
-        <p id="etatMicroConsignes" class="ecran-consignes__texte ecran-consignes__micro-etat">Micro non configuré</p>
+        <p id="etatMicroConsignes" class="ecran-consignes_texte ecran-consignes_micro-etat">Micro non configuré</p>
 
         <button id="btnLancerJeu" type="button" class="btn-lancer">Lancer le jeu</button>
         <button id="btnRevoirCinematique" type="button" class="btn-lancer btn-revoir-cinematique cache">Revoir la cinématique</button>
@@ -44,19 +44,19 @@
 
     <!-- Cinématique affichée une seule fois après les consignes -->
     <div id="ecranCinematique" class="ecran-cinematique cache" aria-live="polite">
-        <div class="ecran-cinematique__scene">
+        <div class="ecran-cinematique_scene">
             <img id="imagePommierCinematique" src="sprites/pommier.png" alt="Pommier">
-            <img class="pomme-cine pomme-cine--1" src="sprites/pommeRouge.png" alt="">
-            <img class="pomme-cine pomme-cine--2" src="sprites/pommeRouge.png" alt="">
-            <img class="pomme-cine pomme-cine--3" src="sprites/pommeRouge.png" alt="">
+            <img class="pomme-cine pomme-cine-1" src="sprites/pommeRouge.png" alt="">
+            <img class="pomme-cine pomme-cine-2" src="sprites/pommeRouge.png" alt="">
+            <img class="pomme-cine pomme-cine-3" src="sprites/pommeRouge.png" alt="">
         </div>
 
-        <p id="texteCinematique" class="ecran-cinematique__texte">Secoue ton téléphone !</p>
-        <button id="btnSecouerArbre" type="button" class="ecran-cinematique__btn-secret" aria-label="Déclencher la secousse (test PC)"></button>
+        <p id="texteCinematique" class="ecran-cinematique_texte">Secoue ton téléphone !</p>
+        <button id="btnSecouerArbre" type="button" class="ecran-cinematique_btn-secret" aria-label="Déclencher la secousse (test PC)"></button>
     </div>
 
     <!-- Écran qui s'affiche en cas de fin par manque de vies-->
-    <div id="ecranGameOver" class="ecran-fin ecran-fin--popup cache">
+    <div id="ecranGameOver" class="ecran-fin ecran-fin-popup cache">
         <h2 id="gameOverTitre">JEU PERDU !</h2>
         <p id="gameOverScore">Score : 0</p>
         <button id="btnRejouerGameOver" type="button">Rejouer</button>
@@ -64,10 +64,10 @@
 
     <!-- Écran qui s'affiche en cas de victoire (temps écoulé)-->
     <div id="ecranVictoire" class="ecran-fin cache">
-        <div class="ecran-victoire__contenu">
+        <div class="ecran-victoire_contenu">
             <h2 id="victoireTitre">Partie terminée</h2>
             <p id="victoireScore">Score : 0</p>
-            <div class="ecran-fin__actions">
+            <div class="ecran-fin_actions">
                 <button id="btnRejouerVictoire" type="button">Rejouer</button>
                 <button id="btnContinuerHistoire" type="button">Continuer l'histoire</button>
             </div>
@@ -75,6 +75,7 @@
         </div>
     </div>
 
+    <!-- Message qui s'affiche quand le téléphone est en mode paysage-->
     <div id="ecranOrientation" class="ecran-orientation cache" aria-live="polite">
         <p>Veuillez mettre votre téléphone en mode portrait :)</p>
     </div>
